@@ -1,0 +1,50 @@
+Implementation of Testbench System where a C application drives a VHDL
+entity using the ModelSim VHDL simulator
+------------------------------------------------------------------------
+
+
+The application is implemented as a client/server application that
+uses semaphores and shared memory for communication. The advantage of
+using shared memory is the flexibility of data structures that can be
+exchanged (any serializable data structure will do) and the speed of
+the communication. Sinc client and server operate on the shared memory
+area, the data transfer is very fast. The coordination of the shared
+memory area is done using posix semaphores. For a good reference on these UNIX IPC mechanisms, see [1]
+
+Idea: Coordinate access to shared memory using semaphores.  Shared
+memory holds data that has to be sent from client to server and vice
+versa.
+
+
+There are 2 binary semaphores:
+
+client_done
+server_done
+
+
+client_done is initialized to 0.
+
+After the client has placed its parameters to the call of the server
+function in the shared memory area, it posts client_done. The client
+now waits for the completion of the request on the server by waiting
+for the server_done semaphore.
+
+Meanwhile, the server was waiting on client_done. The Server has
+initialized its semaphore server_done also to 0. As soon as the server
+gets signaled the release of the client_done semaphore by the client,
+it takes the arguments form the shared memory area, computes the
+results and writes back the results to the shared memory area.
+
+The control is now passed back to the client by posting the
+server_done semaphore. The server now waits for a new request waiting
+for the client_done semaphore.
+
+
+
+
+
+Bibliography:
+
+[1] W. Richard Stevens
+Unix Network Programming, Interprocess communications
+Volume 2, second edition, Prentice Hall

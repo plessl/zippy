@@ -1,0 +1,79 @@
+# $Id: Makefile 146 2004-10-28 10:04:09Z plessl $
+# $URL$
+
+include ../../make.defs
+
+TBTARGET = $(shell basename `pwd`)
+TESTBENCH = tb_$(TBTARGET)
+WORKDIR = work
+VCOMFL = -quiet -lint -93
+
+# path to zippy VHDL model
+ZVDIR = ..
+
+# path to cosimulation directory
+COSIMDIR = ../../../cosim
+
+all:	vhdl configuration
+
+#	# @echo "simulation deactivated, nothing to do for all"
+
+vhdl:
+	test -d work || $(VLIB) work
+	$(VCOM) $(VCOMFL) -work $(WORKDIR) $(ZVDIR)/txt_util.vhd
+	$(VCOM) $(VCOMFL) -work $(WORKDIR) $(ZVDIR)/auxPkg.vhd
+## the architecture parameters are in the testbench's directory
+	$(VCOM) $(VCOMFL) -work $(WORKDIR) tbcomponents_archConfigPkg.vhd 
+	$(VCOM) $(VCOMFL) -work $(WORKDIR) $(ZVDIR)/zarchPkg.vhd
+	$(VCOM) $(VCOMFL) -work $(WORKDIR) $(ZVDIR)/configPkg.vhd
+	$(VCOM) $(VCOMFL) -work $(WORKDIR) $(ZVDIR)/componentsPkg.vhd
+	$(VCOM) $(VCOMFL) -work $(WORKDIR) $(ZVDIR)/zunit.vhd
+	$(VCOM) $(VCOMFL) -work $(WORKDIR) $(ZVDIR)/counter.vhd
+	$(VCOM) $(VCOMFL) -work $(WORKDIR) $(ZVDIR)/tristatebuf.vhd
+	$(VCOM) $(VCOMFL) -work $(WORKDIR) $(ZVDIR)/schedulestore.vhd
+	$(VCOM) $(VCOMFL) -work $(WORKDIR) $(ZVDIR)/schedulectrl.vhd
+	$(VCOM) $(VCOMFL) -work $(WORKDIR) $(ZVDIR)/row.vhd
+	$(VCOM) $(VCOMFL) -work $(WORKDIR) $(ZVDIR)/routel.vhd
+	$(VCOM) $(VCOMFL) -work $(WORKDIR) $(ZVDIR)/memory.vhd
+	$(VCOM) $(VCOMFL) -work $(WORKDIR) $(ZVDIR)/reg.vhd
+	$(VCOM) $(VCOMFL) -work $(WORKDIR) $(ZVDIR)/pull.vhd
+	$(VCOM) $(VCOMFL) -work $(WORKDIR) $(ZVDIR)/procel.vhd
+	$(VCOM) $(VCOMFL) -work $(WORKDIR) $(ZVDIR)/mux.vhd
+	$(VCOM) $(VCOMFL) -work $(WORKDIR) $(ZVDIR)/ioportctrl.vhd
+	$(VCOM) $(VCOMFL) -work $(WORKDIR) $(ZVDIR)/flipflop.vhd
+	$(VCOM) $(VCOMFL) -work $(WORKDIR) $(ZVDIR)/fifo.vhd
+	$(VCOM) $(VCOMFL) -work $(WORKDIR) $(ZVDIR)/fifoctrl.vhd
+	$(VCOM) $(VCOMFL) -work $(WORKDIR) $(ZVDIR)/engine.vhd
+	$(VCOM) $(VCOMFL) -work $(WORKDIR) $(ZVDIR)/engclearctrl.vhd
+	$(VCOM) $(VCOMFL) -work $(WORKDIR) $(ZVDIR)/decoder.vhd
+	$(VCOM) $(VCOMFL) -work $(WORKDIR) $(ZVDIR)/cycledncntr.vhd
+	$(VCOM) $(VCOMFL) -work $(WORKDIR) $(ZVDIR)/cyclecntctrl.vhd
+	$(VCOM) $(VCOMFL) -work $(WORKDIR) $(ZVDIR)/contextselctrl.vhd
+	$(VCOM) $(VCOMFL) -work $(WORKDIR) $(ZVDIR)/contextregfile.vhd
+	$(VCOM) $(VCOMFL) -work $(WORKDIR) $(ZVDIR)/contextmux.vhd
+	$(VCOM) $(VCOMFL) -work $(WORKDIR) $(ZVDIR)/configmem.vhd
+	$(VCOM) $(VCOMFL) -work $(WORKDIR) $(ZVDIR)/cell.vhd
+	$(VCOM) $(VCOMFL) -work $(WORKDIR) $(ZVDIR)/cclkgating.vhd
+### these files are also in the current directory
+#	$(VCOM) $(VCOMFL) -work $(WORKDIR) $(TBTARGET)_cfg.vhd
+#	$(VCOM) $(VCOMFL) -work $(WORKDIR) tb_$(TBTARGET).vhd
+## compile files for co-simulation and add them to library
+#	$(VCOM) $(VCOMFL) -work $(WORKDIR) $(COSIMDIR)/cosim.vhd
+
+configuration: $(TBTARGET)_cfg.h
+
+$(TBTARGET)_cfg.h:	tb_$(TBTARGET).vhd $(TBTARGET)_cfg.vhd
+	@echo "generating configuration .h file for $(TESTBENCH)"
+	$(VSIM) -quiet -lib $(WORKDIR) $(TESTBENCH) -c -do \
+	   ' set NumericStdNoWarnings 1; run 0ns; quit; '
+
+
+
+clean:
+	rm -rf *~
+	rm -rf work
+	rm -f $(TBTARGET)_cfg.h 
+	rm -f vsim.wlf modelsim.tcl modelsim.ini transcript
+
+.PHOHY:	vhdl configuration
+

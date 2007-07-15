@@ -1,0 +1,299 @@
+=========================================================================
+A guide to the Zippy VHDL model
+Christian Plessl <plessl@tik.ee.ethz.ch>
+=========================================================================
+
+
+
+Multiplexers used in data-path and routing
+--------------------------------------------------------------------------
+  mux.vhd  defines all kinds of multiplexers used in the Zippy 
+           architecture. 
+
+Flipflops and Registers
+--------------------------------------------------------------------------
+
+  reg.vhd  defines all kinds of registers that are used in the Zippy
+           archiecture. 
+
+           flipflop_clr: register 1 bit with sync clear
+           flipflop.vhd: register 1 bit
+           reg_clr_en:   register with sync clear (generic: width)
+           reg_en:       register with enable (generic: width)
+           reg_aclr_en:  register with async clear (generic: width)
+
+
+
+Counter
+--------------------------------------------------------------------------
+
+   counter.vhd defines counters
+
+           upcounter     loadable counter with enable and reset
+           updowncounter loadable up/down counter with enable and reset
+
+FIFOs
+--------------------------------------------------------------------------
+  fifo.vhd          fifo (generic: width,depth)
+
+  fifoctrl.vhd      controller to arbitrate between two concurrent users
+                    of the fifo (engine and host interface/decoder)
+
+Miscellaneous
+--------------------------------------------------------------------------
+
+pull.vhd
+
+  pull-up/pull-down component for signals and buses
+
+
+tristatebuf.vhd
+
+  tristate buffer (generic: width)
+
+
+cclkgating.vhd
+
+   A simple combinational clock gate, i.e. basically this is a simple
+   and gate.
+
+
+componentsPkg.vhd
+
+  The components package declares all common components that are
+  shared between the entities, e.g. multiplexers, registers, etc.
+
+auxPkg.vhd
+
+  Auxiliary routines for printing numbers and characters
+
+
+
+Host processor interface, configuration and FIFO logic
+--------------------------------------------------------------------------
+
+decoder.vhd 
+
+  address decoder that decodes the read/wirte commands on the host
+  interface and generates the appropriate control signals
+
+
+ioportctrl.vhd
+
+  controller for generation of IO port control signals e.g. for FIFO
+  read/write enables
+
+
+
+
+Configuration and scheduler
+--------------------------------------------------------------------------
+
+configmem.vhd 
+
+  configuration memory for one single context. The configuration
+  memory is written in slices of equal size. The configuration memory
+  implements a simple DMA controller for loading configurations.
+
+
+schedulestore.vhd 
+
+  The context scheduler cyclically activates a sequence of contexts,
+  where each context is activated for a fixed amount of cycles. The
+  context store implements the RAM needed for storing the context
+  sequence and is used for deconding the contents of the schedule
+  store.
+
+
+schedulectrl.vhd
+
+  The schedule controlller implements the sequencing of the
+  contexts. If activates a context as long as it's execution time, and
+  switches to the next context after the current context if needed.
+
+
+contextmux.vhd
+
+  The context multiplexer is used to select one particular
+  configuration (context) from the configuration memory.
+
+
+contextselctrl.vhd
+
+  arbitrates between host interface decoder and the context
+  scheduler. The Context selection controller generates control
+  signals for the context selection multiplexer.
+
+
+contextregfile.vhd
+
+  Context register file holds the state of a context and is used in
+  the processing element (procel).
+
+
+cycledncntr.vhd
+
+  Loadable cycle counter that controls the execution of the array. The
+  counter value is decreased until it reaches zero.
+
+cyclecntctrl.vhd
+
+  The loading of the cycle down counter needs to be arbitrated between
+  the host interface and the context scheduler. The CycleCntCtrl
+  controller arbitrates between these accesses.
+
+engclearctrl.vhd
+
+  FIXME: purpose of this code is not clear to me
+
+
+
+Computation cell, engine and routing resources
+--------------------------------------------------------------------------
+
+
+routel.vhd
+
+  Routing element in engine. Route input data from interconnect to
+  processing element.
+  FIXME: provide more details and drawings
+
+
+procel.vhd
+
+ Procel is the computation element within a Zippy cell. It is essentially
+ an ALU with two inputs that are optionally registered and an output. 
+ The input and output registers replicated for each context and can be 
+ optionally cleared at a context switch.
+
+
+cell.vhd
+
+  A cell is a computation/routing unit used in the engine. It is composed by
+  a computation element (procel) and a routing element (routel).
+
+
+engine.vhd
+
+  The engine is the core of the zippy architecture. It combines the cells
+  that form a grid, the local and bus interconnect between the cells, the io
+  ports and the corresponding io port controllers.
+
+
+row.vhd
+
+  Row is a 1dimensional row of cells used in the engine.
+  
+  
+configPkg.vhd	
+  
+  This package provides a number of functions that convert the configuration
+  of the Zippy array from a human readable, hierarchitcal VHDL-record form
+  to a bitstring representation.
+  The configuration can also be transformed into a C header file. The data
+  from this header file is used to configure the zunit via the host interface.
+
+
+zunit.vhd
+
+  Top level entity the defines the whole multi-context Zippy unit. All 
+  top-level comonents (Engine, Configuration memory, host interface decoder,
+  FIFOs, Controllers, context scheduler) are instantiated and connected.
+
+
+zarchPkg.vhd
+
+  The zippy architecture is widely parameterized. The parameters that define
+  the architecture are declared in this package, e.g. data-width, size of 
+  array, number of contexts, FIFO sizes etc.
+
+
+
+Case studies and configuration libraries
+--------------------------------------------------------------------------
+
+
+cfglib_fir.vhd
+
+ library of FIR filter configurations for the 4x4 zippy array, as used in 
+ a couple of case studies (ERSA,FPL,Micpro,Rolfs PhD thesis)
+
+
+tb_zunit.vhd
+
+ testbench for the zunit. Used for standalone simulation and generation 
+ of the configuration header file used for the system co-simulation.
+ 
+ 
+tb_zunit-fir8.vhd
+
+  testbench for the fir8 case study. Used for standalone simulation and for
+  generating the configuration header file for system co-simulation.
+
+
+
+
+Testbenches for component tests
+--------------------------------------------------------------------------
+
+testbenches/tb_zunit-fir4sh.vhd
+testbenches/tb_routel.vhd
+testbenches/tb_updowncounter.vhd
+testbenches/tb_fifo.vhd
+testbenches/tb_reg_en.vhd
+testbenches/tb_reg_clr_en.vhd
+testbenches/tb_configmem.vhd
+testbenches/tb_fifo2.vhd
+testbenches/tb_engine.vhd
+testbenches/tb_fifoctrl.vhd
+testbenches/tb_cycledncntr.vhd
+testbenches/tb_pull.vhd
+testbenches/tb_contextmux.vhd
+testbenches/tb_cell.vhd
+testbenches/tb_gmux.vhd
+testbenches/tb_schedulectrl.vhd
+testbenches/tb_mux4to1.vhd
+testbenches/tb_contextregfile.vhd
+testbenches/tb_procel.vhd
+testbenches/tb_upcounter.vhd
+testbenches/tb_mux8to1.vhd
+testbenches/tb_tristatebuf.vhd
+testbenches/tb_reg_aclr_en.vhd
+testbenches/tb_ioportctrl.vhd
+testbenches/tb_mux16to1.vhd
+testbenches/tb_decoder.vhd
+testbenches/tb_cclkgating.vhd
+testbenches/tb_configPkg.vhd
+testbenches/tb_row.vhd
+testbenches/tb_schedulestore.vhd
+
+
+
+======================================================================
+Signal/Bus naming conventions in Rolfs Code
+======================================================================
+
+Cells:
+  Rows are denoted with letters, A,B,C,D
+  Columns are denoted with numbers 0,1,2,3
+
+Buses:
+
+  Horizontal north:
+
+    buses are denoted with HBusXYz where X and Y are
+    the names of the rows inbetween which the buses are running and z
+    indicates the bus number.
+
+    E.g., HBusAB1 is the horizontal north bus number 1 running between 
+    row A and B.
+
+
+  Horizontal south (horiz. feedback buses)
+
+    buses are denoted with HBusXX where X denotes the south row to which
+    the bus connects to.
+
+    E.g., HBusCC is the south bus of row C
+
+

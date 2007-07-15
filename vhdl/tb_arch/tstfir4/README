@@ -1,0 +1,28 @@
+$Id: README 149 2004-10-29 15:42:55Z plessl $
+
+This testbench provides a couple of features for automated regression
+testing. The testbench does not only provide stimuli to be applied to
+the DUT, but also the expected reponses for these stimuli.
+
+The testbench automatically verifies, that the response of the DUT
+matches the expected responses.
+
+Standalone simulation with the testbench can be done using the:
+
+  ./runTestbench.sh script
+
+
+which calls the runTestbench.do TCL script within ModelSim. The
+runTestbench.do script installs a handler to detect the end of a
+(successful) simulation.
+
+
+  set NumericStdNoWarnings 1
+  run 0ns
+  set NumericStdNoWarnings 0
+  when { /tbStatus == done } {
+     echo "Testbench successfully terminated at time $now"
+     quit -f
+  }
+  run -all
+  quit

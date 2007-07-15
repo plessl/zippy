@@ -1,0 +1,23 @@
+#!/bin/env perl
+
+use warnings;
+use strict;
+
+my $i;
+
+open(INP, $ARGV[0]);
+
+while (not eof(INP)) {
+
+  read INP, $i, 2;
+#  my $stringRep = unpack("H4",$i);
+#  print "X\"$stringRep\"\n";
+
+  my $stringRep = unpack("B16",$i);
+  print "$stringRep\n";
+
+
+}
+
+
+# -*- Perl -*-

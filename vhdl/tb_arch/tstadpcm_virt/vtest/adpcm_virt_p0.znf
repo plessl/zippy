@@ -1,0 +1,28 @@
+znf 0.1 adpcm_v1
+i in p_i.0:f
+o out p_o.1:f
+
+c op0   std * f=alu_rom,i.0=noreg,rom=indextable,o.0=noreg
+c op1   std * f=alu_add,i.0=noreg,i.1=reg,o.0=noreg
+c op2   std * f=alu_gt,i.0=noreg,i.1=const,const=88,o.0=noreg
+c op3   std * f=alu_lt,i.0=noreg,i.1=const,const=0,o.0=noreg
+c op4a  std * f=alu_mux,i.0=const,i.1=const,i.2=noreg,const=88,o.0=noreg
+c op4b  std * f=alu_mux,i.0=noreg,i.1=const,i.2=noreg,const=0,o.0=noreg
+c op4c  std * f=alu_mux,i.0=noreg,i.1=noreg,i.2=noreg,o.0=noreg
+c op19  std * f=alu_rom,rom=stepsizetable,i.0=noreg,o.0=noreg
+c opt120  std c_3_1:f f=alu_pass0,i.0=noreg
+
+# primary inputs
+n nin  in        op0.i.0
+
+# virtual primary inputs
+# --none
+
+n n0   op0.o.0   op1.i.0
+n n1   op1.o.0   op2.i.0,op3.i.0,op4b.i.0
+n n2   op2.o.0   op4c.i.2
+n n3   op3.o.0   op4a.i.2,op4b.i.2
+n n4a  op4a.o.0  op4c.i.1
+n n4b  op4b.o.0  op4c.i.0
+n n4c  op4c.o.0  op1.i.1,op19.i.0
+n n19  op19.o.0  opt120.i.0

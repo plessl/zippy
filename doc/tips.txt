@@ -1,0 +1,8 @@
+
+Running confiugurations for small arrays on larger arrays.
+
+Running a configuration for a 4x4 array on a 8x8 array, does generally
+_not_ work, since the zippy array uses cyclical continuation of
+routing. Therefore cells c_0_0 and c_0_3 are direct neighbors on a 4x4
+array, but are no direct neighbors on a 8x8 array. If local
+interconnect is used, the circuit will not be portable.

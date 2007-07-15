@@ -1,0 +1,14 @@
+# -*- Makefile -*-
+
+MAKE = gmake
+HEAD = ghead
+
+SOX = sox
+
+CC = gcc-3.4.3
+MODELSIMV = 6.0a-ma
+MTI_HOME = /usr/pack/modelsim-$(MODELSIMV)/modeltech
+VSIM = vsim-$(MODELSIMV)
+VCOM = vcom-$(MODELSIMV)
+VMAKE = vmake-$(MODELSIMV)
+VLIB = vlib-$(MODELSIMV)

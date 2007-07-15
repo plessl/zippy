@@ -1,0 +1,29 @@
+#!/bin/env perl
+
+use warnings;
+use strict;
+
+my $i;
+my @data;
+
+open(INP, $ARGV[0]);
+
+while (not eof(INP)) {
+
+  read INP, $i, 2;
+  my $stringRep = unpack("H16",$i);
+
+  push @data,"0x".$stringRep;
+}
+
+print sprintf("#define PCMLEN %d\n", scalar(@data));
+print "short pcmData[PCMLEN] = {\n\t";
+
+for ($i=10; $i<scalar(@data); $i+=10){
+    $data[$i] = "\n\t".$data[$i];
+}
+print join(",",@data);
+print "\n};\n";
+
+
+# -*- Perl -*-

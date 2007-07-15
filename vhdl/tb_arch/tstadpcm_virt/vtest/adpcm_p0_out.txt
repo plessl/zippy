@@ -1,0 +1,310 @@
+===========================================================================
+command line: -netlist vtest/adpcm_virt_p0.znf -architecture Benchmarks/Architectures/adpcm_virt_4x4.arch -pii 50 -pio 50 -t 0.2 -tu 0.8 -vhdl vtest/adpcm_p0.vhd
+===========================================================================
+netlist name:                   vtest/adpcm_virt_p0.znf
+architecture definition file    Benchmarks/Architectures/adpcm_virt_4x4.arch
+output filename:                
+max routing iterations:         40
+max inner placement iterations: 50
+max outer placement iterations: 50
+temperature:                    0.200000
+temperatureUpdate:              0.800000
+verbose level:                  0
+===========================================================================
+
+RoutingGraph: Using architecture description defined by Benchmarks/Architectures/adpcm_virt_4x4.arch
+======================================================================
+Architecture definition: (from file Benchmarks/Architectures/adpcm_virt_4x4.arch)
+======================================================================
+ROWS=4 COLS=4
+INPS=2 OPS=2
+HBUS_H=2 HBUS_S=2 VBUS_E=2
+======================================================================
+statistics:
+routing graph has:
+  450 vertices
+  742 edges
+======================================================================
+netlist:
+	znf 0.1 adpcm_v1
+
+znf:znf version:0.100000 name:adpcm_v1
+inputs: 
+	i in p_i.0:f
+
+outputs:
+	o out p_o.1:f
+
+cells:
+	c op0 std * f=alu_rom,i.0=noreg,rom=indextable,o.0=noreg
+	c op1 std * f=alu_add,i.0=noreg,i.1=reg,o.0=noreg
+	c op2 std * f=alu_gt,i.0=noreg,i.1=const,const=88,o.0=noreg
+	c op3 std * f=alu_lt,i.0=noreg,i.1=const,const=0,o.0=noreg
+	c op4a std * f=alu_mux,i.0=const,i.1=const,i.2=noreg,const=88,o.0=noreg
+	c op4b std * f=alu_mux,i.0=noreg,i.1=const,i.2=noreg,const=0,o.0=noreg
+	c op4c std * f=alu_mux,i.0=noreg,i.1=noreg,i.2=noreg,o.0=noreg
+	c op19 std * f=alu_rom,rom=stepsizetable,i.0=noreg,o.0=noreg
+	c opt120 std c_3_1:f f=alu_pass0,i.0=noreg
+
+nets:
+	n nin in op0.i.0
+	n n0 op0.o.0 op1.i.0
+	n n1 op1.o.0 op2.i.0,op3.i.0,op4b.i.0
+	n n2 op2.o.0 op4c.i.2
+	n n3 op3.o.0 op4a.i.2,op4b.i.2
+	n n4a op4a.o.0 op4c.i.1
+	n n4b op4b.o.0 op4c.i.0
+	n n4c op4c.o.0 op1.i.1,op19.i.0
+	n n19 op19.o.0 opt120.i.0
+
+SA placer: Creating initial placement for netlist
+primary inputs: in
+primary outputs: 
+scheduling successor op0 of in
+last op was placed to c_0_0,current op in could be placed to:c_3_0,c_0_1,c_1_1,c_1_0,c_1_3,c_0_3,c_3_3
+scheduling precessor op19 of opt120
+op opt120 could be placed to:c_2_1,c_2_2,c_3_2,c_0_2,c_0_1,c_0_0,c_2_0
+scheduling successor op1 of op0
+last op was placed to c_3_0,current op op0 could be placed to:c_2_0,c_0_1,c_0_0,c_0_3,c_3_3,c_2_3
+scheduling precessor op4c of op19
+op op19 could be placed to:c_1_1,c_1_2,c_2_2,c_3_2,c_1_0
+scheduling successor op2 of op1
+placing a fanout net with fanout of 3
+last op was placed to c_2_0,current op op1 could be placed to:c_2_2,c_2_3,c_1_0,c_1_2,c_1_3,c_3_2,c_3_3
+scheduling successor op3 of op1
+placing a fanout net with fanout of 3
+last op was placed to c_2_0,current op op1 could be placed to:c_2_3,c_1_0,c_1_2,c_1_3,c_3_2,c_3_3
+scheduling successor op4b of op1
+placing a fanout net with fanout of 3
+last op was placed to c_2_0,current op op1 could be placed to:c_1_0,c_1_2,c_1_3,c_3_2,c_3_3
+scheduling precessor op4a of op4c
+op op4c could be placed to:c_0_1,c_0_2,c_1_2,c_0_0
+updatePlacement
+c op0 cell c_3_0:i
+c op1 cell c_2_0:i
+c op19 cell c_2_1:i
+c op2 cell c_2_2:i
+c op3 cell c_2_3:i
+c op4a cell c_0_1:i
+c op4b cell c_1_0:i
+c op4c cell c_1_1:i
+c opt120 cell c_3_1:f
+checking if placement is valid for net nin
+checking if placement is valid for net n0
+checking if placement is valid for net n1
+checking if placement is valid for net n2
+checking if placement is valid for net n3
+checking if placement is valid for net n4a
+checking if placement is valid for net n4b
+checking if placement is valid for net n4c
+checking if placement is valid for net n19
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Place and Route: Outer Iteration: 1/50  Inner Iteration 1/50
+% Temperature = 0.2
+% Best Routing:  0 of 9 nets routed
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+No random move at very first iteration!
+checking if placement is valid for net nin
+checking if placement is valid for net n0
+checking if placement is valid for net n1
+checking if placement is valid for net n2
+checking if placement is valid for net n3
+checking if placement is valid for net n4a
+checking if placement is valid for net n4b
+checking if placement is valid for net n4c
+checking if placement is valid for net n19
+Netlist has a valid placement.
+XXX Pathfinder: routing iteration 0
+route: iter 1/40  nets tot/suc/fail/rem (9,1,0,8) net: nin
+route: iter 1/40  nets tot/suc/fail/rem (9,2,0,7) net: n0
+route: iter 1/40  nets tot/suc/fail/rem (9,3,0,6) net: n1
+route: iter 1/40  nets tot/suc/fail/rem (9,4,0,5) net: n2
+route: iter 1/40  nets tot/suc/fail/rem (9,5,0,4) net: n3
+route: iter 1/40  nets tot/suc/fail/rem (9,6,0,3) net: n4a
+route: iter 1/40  nets tot/suc/fail/rem (9,7,0,2) net: n4b
+route: iter 1/40  nets tot/suc/fail/rem (9,8,0,1) net: n4c
+route: iter 1/40  nets tot/suc/fail/rem (9,9,0,0) net: n19
+update_historical_cost()
+finished routing iteration(no overusage)
+ROUTING SUCCEDED: after 1 iterations
+****** Routing succeeded in iteration 1 : 1 
+===========================================================================
+= Netlist successfully routed
+=   Outer placer iterations: 1  (max: 50)
+=   Inner placer iterations: 1  (max: 50)
+===========================================================================
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Routed netlist:
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+net: nin
+	routing status: routed
+	wire 0:
+		from:in [p_i.0 constr:fixed]	to:op0 [c_3_0 constr:none]
+		sourcePort: in
+		sinkPort: op0.i.0
+		path: 
+			[p_i.0,
+			b_i.0,
+			s_b_i.0-b_hn.3.1,
+			b_hn.3.1,
+			w_b_hn.3.1-c_i_3_0,
+			c_i_3_0
+			]
+		pathcost: 5
+net: n0
+	routing status: routed
+	wire 0:
+		from:op0 [c_3_0 constr:none]	to:op1 [c_2_0 constr:none]
+		sourcePort: op0.o.0
+		sinkPort: op1.i.0
+		path: 
+			[c_o_3_0,
+			w_c_o_3_0-c_i_2_0,
+			c_i_2_0
+			]
+		pathcost: 2
+net: n1
+	routing status: routed
+	wire 0:
+		from:op1 [c_2_0 constr:none]	to:op2 [c_2_2 constr:none]
+		sourcePort: op1.o.0
+		sinkPort: op2.i.0
+		path: 
+			[c_o_2_0,
+			w_c_o_2_0-c_i_3_0,
+			s_w_c_o_2_0-c_i_3_0-b_hs.2.1,
+			b_hs.2.1,
+			w_b_hs.2.1-c_i_2_2,
+			c_i_2_2
+			]
+		pathcost: 5
+	wire 1:
+		from:op1 [c_2_0 constr:none]	to:op3 [c_2_3 constr:none]
+		sourcePort: op1.o.0
+		sinkPort: op3.i.0
+		path: 
+			[c_o_2_0,
+			w_c_o_2_0-c_i_2_3,
+			c_i_2_3
+			]
+		pathcost: 2
+	wire 2:
+		from:op1 [c_2_0 constr:none]	to:op4b [c_1_0 constr:none]
+		sourcePort: op1.o.0
+		sinkPort: op4b.i.0
+		path: 
+			[c_o_2_0,
+			w_c_o_2_0-c_i_1_0,
+			c_i_1_0
+			]
+		pathcost: 2
+net: n2
+	routing status: routed
+	wire 0:
+		from:op2 [c_2_2 constr:none]	to:op4c [c_1_1 constr:none]
+		sourcePort: op2.o.0
+		sinkPort: op4c.i.2
+		path: 
+			[c_o_2_2,
+			w_c_o_2_2-c_i_1_1,
+			c_i_1_1
+			]
+		pathcost: 2
+net: n3
+	routing status: routed
+	wire 0:
+		from:op3 [c_2_3 constr:none]	to:op4a [c_0_1 constr:none]
+		sourcePort: op3.o.0
+		sinkPort: op4a.i.2
+		path: 
+			[c_o_2_3,
+			w_c_o_2_3-c_i_3_2,
+			c_i_3_2,
+			w_c_i_3_2_c_o_3_2,
+			c_o_3_2,
+			w_c_o_3_2-c_i_0_1,
+			c_i_0_1
+			]
+		pathcost: 6
+	wire 1:
+		from:op3 [c_2_3 constr:none]	to:op4b [c_1_0 constr:none]
+		sourcePort: op3.o.0
+		sinkPort: op4b.i.2
+		path: 
+			[c_o_2_3,
+			w_c_o_2_3-c_i_1_0,
+			c_i_1_0
+			]
+		pathcost: 2
+net: n4a
+	routing status: routed
+	wire 0:
+		from:op4a [c_0_1 constr:none]	to:op4c [c_1_1 constr:none]
+		sourcePort: op4a.o.0
+		sinkPort: op4c.i.1
+		path: 
+			[c_o_0_1,
+			w_c_o_0_1-c_i_1_1,
+			c_i_1_1
+			]
+		pathcost: 2
+net: n4b
+	routing status: routed
+	wire 0:
+		from:op4b [c_1_0 constr:none]	to:op4c [c_1_1 constr:none]
+		sourcePort: op4b.o.0
+		sinkPort: op4c.i.0
+		path: 
+			[c_o_1_0,
+			w_c_o_1_0-c_i_1_1,
+			c_i_1_1
+			]
+		pathcost: 2
+net: n4c
+	routing status: routed
+	wire 0:
+		from:op4c [c_1_1 constr:none]	to:op1 [c_2_0 constr:none]
+		sourcePort: op4c.o.0
+		sinkPort: op1.i.1
+		path: 
+			[c_o_1_1,
+			w_c_o_1_1-c_i_2_0,
+			c_i_2_0
+			]
+		pathcost: 2
+	wire 1:
+		from:op4c [c_1_1 constr:none]	to:op19 [c_2_1 constr:none]
+		sourcePort: op4c.o.0
+		sinkPort: op19.i.0
+		path: 
+			[c_o_1_1,
+			w_c_o_1_1-c_i_2_1,
+			c_i_2_1
+			]
+		pathcost: 2
+net: n19
+	routing status: routed
+	wire 0:
+		from:op19 [c_2_1 constr:none]	to:opt120 [c_3_1 constr:fixed]
+		sourcePort: op19.o.0
+		sinkPort: opt120.i.0
+		path: 
+			[c_o_2_1,
+			w_c_o_2_1-c_i_3_1,
+			c_i_3_1
+			]
+		pathcost: 2
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Placement only:
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+c op0 cell c_3_0:i
+c op1 cell c_2_0:i
+c op19 cell c_2_1:i
+c op2 cell c_2_2:i
+c op3 cell c_2_3:i
+c op4a cell c_0_1:i
+c op4b cell c_1_0:i
+c op4c cell c_1_1:i
+c opt120 cell c_3_1:f
+insert feedtrough cell at c_3_2 with feedWire:w_c_o_2_3-c_i_3_2 driveWire:c_i_0_1

@@ -1,0 +1,55 @@
+znf 0.1 adpcm_v3
+i in p_i.0:f
+o out p_o.1:f
+
+c opt230 std c_1_0:f f=alu_pass0,o.0=reg[1]
+c opt231 std c_2_0:f f=alu_pass0,o.0=reg[1]
+c opt232 std c_0_0:f f=alu_pass0,o.0=reg[1]
+
+c op5   std c_3_0:i f=alu_tstbitat1,i.0=noreg,i.1=const,const=8,o.0=noreg
+c op18  std c_3_1:i f=alu_mux,i.0=noreg,i.1=noreg,i.2=noreg,o.0=noreg
+c op20  std c_2_1:i f=alu_add,i.0=noreg,i.1=reg,o.0=noreg
+c op21  std c_2_2:i f=alu_sub,i.0=reg,i.1=noreg,o.0=noreg
+c op22  std c_0_1:i f=alu_mux,i.0=noreg,i.1=noreg,i.2=noreg,o.0=noreg
+c op23  std c_1_3:i f=alu_gt,i.0=noreg,i.1=const,const=32767,o.0=noreg
+c op24  std c_1_1:i f=alu_lt,i.0=noreg,i.1=const,const=-32768,o.0=noreg
+c op25a std c_2_3:i f=alu_mux,i.0=const,i.1=const,i.2=noreg,const=-32767,o.0=noreg
+c op25b std c_0_2:i f=alu_mux,i.0=noreg,i.1=const,i.2=noreg,const=32768,o.0=noreg
+c op25c std c_1_2:i f=alu_mux,i.0=noreg,i.1=noreg,i.2=noreg,o.0=noreg
+c obuf  std c_0_3:i f=alu_pass0,i.0=reg,o.0=noreg
+
+# primary inputs
+n nin  in        op5.i.0
+
+# virtual primary inputs
+n nopt230 opt230.o.0 op18.i.1
+n nopt231 opt231.o.0 op18.i.0
+n nopt232 opt232.o.0 op18.i.2
+
+n n5   op5.o.0   op22.i.2
+n n18  op18.o.0  op20.i.0,op21.i.1
+n n20  op20.o.0  op22.i.0
+n n21  op21.o.0  op22.i.1
+n n22  op22.o.0  op24.i.0,op23.i.0,op25b.i.0
+n n23  op23.o.0  op25a.i.2,op25b.i.2
+n n24  op24.o.0  op25c.i.2
+n n25a op25a.o.0 op25c.i.1
+n n25b op25b.o.0 op25c.i.0
+n n25c op25c.o.0 obuf.i.0,op20.i.1,op21.i.0
+n nout obuf.o.0  out
+
+
+# c obuf cell c_0_3:i
+# c op18 cell c_3_1:i
+# c op20 cell c_2_1:i
+# c op21 cell c_2_2:i
+# c op22 cell c_0_1:i
+# c op23 cell c_1_3:i
+# c op24 cell c_1_1:i
+# c op25a cell c_2_3:i
+# c op25b cell c_0_2:i
+# c op25c cell c_1_2:i
+# c op5 cell c_3_0:i
+# c opt230 cell c_1_0:f
+# c opt231 cell c_2_0:f
+# c opt232 cell c_0_0:f

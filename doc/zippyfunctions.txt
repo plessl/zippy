@@ -1,0 +1,93 @@
+i0 = OpxD(0)
+i1 = OpxD(1)
+i2 = OpxD(3)
+
+Unary instructions
+      
+   Feed through functions:
+
+      alu_pass0 => res := i0
+      alu_pass1 => res := i1
+
+      comment: one of these functions is obsolete. Further using the
+      alu_mux instruction with constant input both instructions are 
+      obsolete acutally
+
+   Negation:
+
+      alu_neg0 =>  res := -i0
+      alu_neg1 =>  res := -i1
+
+      comment: one of these instructions is obsolete, the input the 
+      is inverted can be selected with multiplexer
+
+   Unary logic operations:
+
+      alu_not0 => not i0
+      alu_not1 => not i1
+
+   Memory lookup operations:
+
+      alu_rom => res := ROM[i0];
+
+Binary instructions:
+
+   Arithmetic operations:
+
+      alu_add     => res := i0 + i1
+      alu_sub     => res := i0 - i1
+      alu_addu    => res := i0 + i1  (interpret i0 and i1 as unsigned)
+      alu_subu    => res := i0 - i1  (interpret i0 and i1 as unsigned)
+      alu_multhi  => DATAWIDTH most significant bits of i0*i1
+      alu_multlo  => DATAWIDTH least significant bits of i0*i1
+
+      alu_multuhi  => like alu_multhi but interpret arguments as unsigned
+      alu_multulo  => like alu_multlo but interpret arguments as unsigned
+
+   Binary Logic operators:
+
+      alu_and   => res := i0 and i1
+      alu_nand  => res := i0 nand i1
+      alu_or    => res := i0 or i1
+      alu_nor   => res := i0 nor i1
+      alu_xor   => res := i0 xor i1
+      alu_xnor  => res := i0 xnor i1
+
+   Shift operations:
+
+      alu_sll => res := i0 << i1
+      alu_srl => res := i0 >> i1
+      alu_rol => res := i0 rol i1 (rotate left)
+      alu_ror => res := io ror i1 (rotate right)
+
+   Comparison operators:
+
+      alu_eq  => res := ~0 if i0 == i1, else 0
+      alu_neq => res := ~0 if i0 != i1, else 0
+
+      alu_lt  => res := ~0 if i0  < i1, else 0 
+      alu_lte => res := ~0 if i0 <= i1, else 0
+
+      alu_gt  => res := ~0 if i0  > i1, else 0
+      alu_gte => res := ~0 if i0 >= i1, else 0
+
+      alu_tstbitat0 => 
+
+         res := ~0 if ((not i0) and i1) == i1)
+                 0 else
+
+         tstbitat0(i0,i1) = ~0 if all bits that are set in i1 are
+          also set in i0, else 0
+
+      alu_tstbitat1 =>
+        
+         res := ~0 if ((i0 and i1) == i1)
+	         0 else
+
+         tstbitat1(i0,i1) = ~0 if all bits that are set in i1 are
+          cleared in i0, else 0
+
+Tenary operators:
+
+      alu_mux =>res := i0 if (i2(0)==0) else i1
+

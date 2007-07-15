@@ -1,0 +1,27 @@
+#!/bin/env perl
+
+use warnings;
+use strict;
+
+my $i;
+
+open(INP, $ARGV[0]);
+
+while (not eof(INP)) {
+
+  read INP, $i, 1;
+
+  my $stringRep = unpack("B8",$i);
+  my $firstNibble = substr($stringRep,0,4);
+  my $secondNibble = substr($stringRep,4,4);
+
+  print "$firstNibble\n";
+  print "$secondNibble\n";
+
+# print "$stringRep\n";
+
+
+}
+
+
+# -*- Perl -*-

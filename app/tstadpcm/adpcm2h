@@ -1,0 +1,35 @@
+#!/bin/env perl
+
+# $Id: adpcm2h 236 2005-03-21 14:59:56Z plessl $
+# $URL: svn+ssh://plessl@yosemite.ethz.ch/home/plessl/SVN/simzippy/trunk/app/tstadpcm/adpcm2h $
+
+use warnings;
+use strict;
+
+my $i;
+my @data;
+
+open(INP, $ARGV[0]);
+
+while (not eof(INP)) {
+    read INP, $i, 1;
+    push @data, "0x" . unpack("H8",$i);
+}
+
+print "/* automatically generated file -- do not edit */\n";
+print "/* WARNING: adpcmData is an array of bytes, but actually the ADPCM   */\n";
+print "/*  encoded data is a stream of nibbles. The higher valued nibble of */\n";
+print "/*  of each byte is the first nibble in the ADPCM stream, the lower  */\n";
+print "/*  nibble is the second nibble of the ADPCM stream                  */\n";
+print "\n\n";
+print sprintf("#define ADPCMLEN_BYTES %d\n", scalar(@data));
+print sprintf("#define ADPCMLEN_SAMPLES %d\n", 2*scalar(@data));
+print "unsigned char adpcmData[ADPCMLEN_BYTES] = {\n\t";
+
+for ($i=10; $i<scalar(@data); $i+=10){
+    $data[$i] = "\n\t".$data[$i];
+}
+print join(",",@data);
+print "\n};\n";
+
+# -*- Perl -*-

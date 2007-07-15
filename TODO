@@ -1,0 +1,136 @@
+$Id: TODO 186 2004-12-10 13:34:33Z plessl $
+$URL: svn+ssh://plessl@yosemite.ethz.ch/home/plessl/SVN/simzippy/trunk/TODO $
+
+This file holds the TODO list for simzippy, and a wishlist. 
+
+TODO:
+
+Automated configuration serialization and deserialization testing. Array 
+ configuration is specified with a VHDL configuration record, that is 
+ converted to a serialized version (=configuration bitstream). This 
+ configuration bitstream is converted to a hierarchical record internally
+ after the download.
+
+ IDEA: compare the initial configuration record specified 
+  by the user with the regenerated VHDL configuration record. Any discrepancies
+  are resulting from errors in the serialization and deserialization code and
+  can be detected automatically.
+
+ SIMPLER IDEA: check at least, whether the configuration record contains valid
+  (or plausible) data, i.e. all values are initialized etc.
+
+
+- Cycle counter seems to start at 1 (instead of 0) although this is perfectly
+  valid, it is maybe counter intuitive, since most counters start with 0 in 
+  computer engineering. Maybe this could be reworked, but check for implications
+  first. Additionally the testbenches will need to be updated.
+
+
+- check all files for correct headers and subversion attributes
+
+
+
+VHDL code cleanups:
+
+- input driver and output drivers can be unified
+
+- Name datatypes better
+
+- remove the numerous unnecessary datatypes that are obsolete through
+  data_vector now.
+
+- check whether a data_matrix could be introduces too.
+
+- rename cellInputRec to cellDataInputRec or something similar, to
+  distinguish the cell (data) inputs and outputs and the bus driver
+  enables and configurations.
+
+
+- number of inports is the same as the number of outports, thus the
+  distinction of the two is superflous. Simplify code for input and 
+  output port drivers.
+
+- local input ports could be names directly with symbolic names, by
+  declaring an enumeration type for LOCAL_N, LOCAL_NE, LOCAL_E,
+  etc. Although the configuration file will look similar, this would
+  be more covenient for simulation, because ModelSim would show the
+  symbolic names instead the numerica values assigned to LOCAL_xx.
+
+
+
+
+WISHLIST:
+
+
+
+
+DONE:
+
+* imported simzippy into subversion repository
+  
+ * Reproduce co-simulation results for non-extended Zippy simulation, such
+   that it can be confirmed, that Zippy co-simulation is working before the
+   architecture modifications are made.
+
+* Implement two new cell functions for bit testing:
+
+ 	test_bit_at_0(a,b)  out = ~0 if bit 'b' of word 'a' equals 0, else 0
+ 	test_bit_at_1(a,b)  out = ~0 if bit 'b' of word 'a' equals 1, else 0
+
+  Implemented as tstbitat0 and tstbitat1
+
+* Implemented 2 testbenches that test the tstbitat0 instruction and are also 
+  fairly simple and general, such that they can be adapted to new situations.
+
+* Implemented cells with 3 inputs. Added a new, ternary, operator to the 
+  processing element, alu_mux which implements a multiplexing instruction
+
+    mux(a,b,c)   out = a if c(0)=0 else b
+
+  Extended the processing element (procel) and the routing element (routel)
+  to support the 3rd input to the cell.
+
+  Created a testbench (tstmux) that tests this functionality.
+
+* Modified the architecture, sucht that the FIFOs are used always in the
+  standard mode and not in the cumbersome first word fall-through mode.
+
+* parameterized interconnect. local interconnect is now parameterized and
+  architecture was changed to be fully symmetrical.
+  Additionally the bus interconnect is now also fully parameterized, i.e. 
+  the number of buses can be configured.
+
+* Vertical east buses are introduced. Their behaviour is analogous to the 
+  horizontal south buses.
+
+
+* Architecture has been simplified, sucht that the FIFO is always used in 
+  the standard mode and the FWFT mode is avoided. The old FIR case study 
+  will need to be adapted, in particular the ioport controllers need to be
+  configured differently and the host application needs to be changed.
+
+* Replace FIFO2 with the simpler FIFO1 model
+
+* introduce memory blocks. Idea: one memory block per row, each cell in a 
+  row can access this memory block
+
+* introduce constants that simplify the generation of configurations, e.g.
+  sybolic names of local interconnect (north, northeast, west, etc), for 
+  controllers (ioport etc) and for mux configurations.
+
+* Array size is fully configurable now.
+
+* Update and extend simzippy to the status of the zippy tools. The most important 
+   extensions that will be required are:
+
+  * local interconnect of cells connects to all neighbors now
+  * number of north and south buses is parameterized
+  * east buses have been introduced
+  * rom funcion: rom(a) out = data[a]
+  * unclear: how many cells shall have ROM (maybe also RAM) capabilities
+  * number of cell inputs and outputs vary with bus configuration now
+ 
+* implement non-virtualized ADPCM case-study. Created and verified cosimulation 
+  for ADPCM application too.
+
+

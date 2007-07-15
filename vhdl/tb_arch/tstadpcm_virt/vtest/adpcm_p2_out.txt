@@ -1,0 +1,598 @@
+===========================================================================
+command line: -netlist vtest/adpcm_virt_p2.znf -architecture Benchmarks/Architectures/adpcm_virt_4x4.arch -pii 50 -pio 50 -t 0.2 -tu 0.8 -vhdl vtest/adpcm_p2.vhd
+===========================================================================
+netlist name:                   vtest/adpcm_virt_p2.znf
+architecture definition file    Benchmarks/Architectures/adpcm_virt_4x4.arch
+output filename:                
+max routing iterations:         40
+max inner placement iterations: 50
+max outer placement iterations: 50
+temperature:                    0.200000
+temperatureUpdate:              0.800000
+verbose level:                  0
+===========================================================================
+
+RoutingGraph: Using architecture description defined by Benchmarks/Architectures/adpcm_virt_4x4.arch
+======================================================================
+Architecture definition: (from file Benchmarks/Architectures/adpcm_virt_4x4.arch)
+======================================================================
+ROWS=4 COLS=4
+INPS=2 OPS=2
+HBUS_H=2 HBUS_S=2 VBUS_E=2
+======================================================================
+statistics:
+routing graph has:
+  450 vertices
+  742 edges
+======================================================================
+netlist:
+	znf 0.1 adpcm_v3
+
+znf:znf version:0.100000 name:adpcm_v3
+inputs: 
+	i in p_i.0:f
+
+outputs:
+	o out p_o.1:f
+
+cells:
+	c opt230 std c_1_0:f f=alu_pass0,o.0=reg[1]
+	c opt231 std c_2_0:f f=alu_pass0,o.0=reg[1]
+	c opt232 std c_0_0:f f=alu_pass0,o.0=reg[1]
+	c op5 std c_3_0:i f=alu_tstbitat1,i.0=noreg,i.1=const,const=8,o.0=noreg
+	c op18 std c_3_1:i f=alu_mux,i.0=noreg,i.1=noreg,i.2=noreg,o.0=noreg
+	c op20 std c_2_1:i f=alu_add,i.0=noreg,i.1=reg,o.0=noreg
+	c op21 std c_2_2:i f=alu_sub,i.0=reg,i.1=noreg,o.0=noreg
+	c op22 std c_0_1:i f=alu_mux,i.0=noreg,i.1=noreg,i.2=noreg,o.0=noreg
+	c op23 std c_1_3:i f=alu_gt,i.0=noreg,i.1=const,const=32767,o.0=noreg
+	c op24 std c_1_1:i f=alu_lt,i.0=noreg,i.1=const,const=-32768,o.0=noreg
+	c op25a std c_2_3:i f=alu_mux,i.0=const,i.1=const,i.2=noreg,const=-32767,o.0=noreg
+	c op25b std c_0_2:i f=alu_mux,i.0=noreg,i.1=const,i.2=noreg,const=32768,o.0=noreg
+	c op25c std c_1_2:i f=alu_mux,i.0=noreg,i.1=noreg,i.2=noreg,o.0=noreg
+	c obuf std c_0_3:i f=alu_pass0,i.0=reg,o.0=noreg
+
+nets:
+	n nin in op5.i.0
+	n nopt230 opt230.o.0 op18.i.1
+	n nopt231 opt231.o.0 op18.i.0
+	n nopt232 opt232.o.0 op18.i.2
+	n n5 op5.o.0 op22.i.2
+	n n18 op18.o.0 op20.i.0,op21.i.1
+	n n20 op20.o.0 op22.i.0
+	n n21 op21.o.0 op22.i.1
+	n n22 op22.o.0 op24.i.0,op23.i.0,op25b.i.0
+	n n23 op23.o.0 op25a.i.2,op25b.i.2
+	n n24 op24.o.0 op25c.i.2
+	n n25a op25a.o.0 op25c.i.1
+	n n25b op25b.o.0 op25c.i.0
+	n n25c op25c.o.0 obuf.i.0,op20.i.1,op21.i.0
+	n nout obuf.o.0 out
+
+SA placer: Creating initial placement for netlist
+primary inputs: in
+primary outputs: out
+updatePlacement
+c obuf cell c_0_3:i
+c op18 cell c_3_1:i
+c op20 cell c_2_1:i
+c op21 cell c_2_2:i
+c op22 cell c_0_1:i
+c op23 cell c_1_3:i
+c op24 cell c_1_1:i
+c op25a cell c_2_3:i
+c op25b cell c_0_2:i
+c op25c cell c_1_2:i
+c op5 cell c_3_0:i
+c opt230 cell c_1_0:f
+c opt231 cell c_2_0:f
+c opt232 cell c_0_0:f
+checking if placement is valid for net nin
+checking if placement is valid for net nopt230
+checking if placement is valid for net nopt231
+checking if placement is valid for net nopt232
+checking if placement is valid for net n5
+checking if placement is valid for net n18
+checking if placement is valid for net n20
+checking if placement is valid for net n21
+checking if placement is valid for net n22
+checking if placement is valid for net n23
+checking if placement is valid for net n24
+checking if placement is valid for net n25a
+checking if placement is valid for net n25b
+checking if placement is valid for net n25c
+checking if placement is valid for net nout
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Place and Route: Outer Iteration: 1/50  Inner Iteration 1/50
+% Temperature = 0.2
+% Best Routing:  0 of 15 nets routed
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+No random move at very first iteration!
+checking if placement is valid for net nin
+checking if placement is valid for net nopt230
+checking if placement is valid for net nopt231
+checking if placement is valid for net nopt232
+checking if placement is valid for net n5
+checking if placement is valid for net n18
+checking if placement is valid for net n20
+checking if placement is valid for net n21
+checking if placement is valid for net n22
+checking if placement is valid for net n23
+checking if placement is valid for net n24
+checking if placement is valid for net n25a
+checking if placement is valid for net n25b
+checking if placement is valid for net n25c
+checking if placement is valid for net nout
+Netlist has a valid placement.
+XXX Pathfinder: routing iteration 0
+route: iter 1/40  nets tot/suc/fail/rem (15,1,0,14) net: nin
+route: iter 1/40  nets tot/suc/fail/rem (15,2,0,13) net: nopt230
+route: iter 1/40  nets tot/suc/fail/rem (15,3,0,12) net: nopt231
+route: iter 1/40  nets tot/suc/fail/rem (15,4,0,11) net: nopt232
+route: iter 1/40  nets tot/suc/fail/rem (15,5,0,10) net: n5
+route: iter 1/40  nets tot/suc/fail/rem (15,6,0,9) net: n18
+route: iter 1/40  nets tot/suc/fail/rem (15,7,0,8) net: n20
+route: iter 1/40  nets tot/suc/fail/rem (15,8,0,7) net: n21
+route: iter 1/40  nets tot/suc/fail/rem (15,9,0,6) net: n22
+route: iter 1/40  nets tot/suc/fail/rem (15,10,0,5) net: n23
+route: iter 1/40  nets tot/suc/fail/rem (15,11,0,4) net: n24
+route: iter 1/40  nets tot/suc/fail/rem (15,12,0,3) net: n25a
+route: iter 1/40  nets tot/suc/fail/rem (15,13,0,2) net: n25b
+route: iter 1/40  nets tot/suc/fail/rem (15,14,0,1) net: n25c
+route: iter 1/40  nets tot/suc/fail/rem (15,15,0,0) net: nout
+update_historical_cost()
+finished routing iteration current overusage: 4.000000
+	rsrc w_c_i_3_2_c_o_3_2 COST=1.6 pn=1.3 hn=0.2 bn=1.0 OVERUSAGE 2.0[n21,n20]
+	rsrc w_c_o_3_2-c_i_0_1 COST=1.6 pn=1.3 hn=0.2 bn=1.0 OVERUSAGE 2.0[n21,n20]
+XXX Pathfinder: routing iteration 1
+route: iter 2/40  nets tot/suc/fail/rem (15,1,0,14) net: nin
+route: iter 2/40  nets tot/suc/fail/rem (15,2,0,13) net: nopt230
+route: iter 2/40  nets tot/suc/fail/rem (15,3,0,12) net: nopt231
+route: iter 2/40  nets tot/suc/fail/rem (15,4,0,11) net: nopt232
+route: iter 2/40  nets tot/suc/fail/rem (15,5,0,10) net: n5
+route: iter 2/40  nets tot/suc/fail/rem (15,6,0,9) net: n18
+route: iter 2/40  nets tot/suc/fail/rem (15,7,0,8) net: n20
+route: iter 2/40  nets tot/suc/fail/rem (15,8,0,7) net: n21
+route: iter 2/40  nets tot/suc/fail/rem (15,9,0,6) net: n22
+route: iter 2/40  nets tot/suc/fail/rem (15,10,0,5) net: n23
+route: iter 2/40  nets tot/suc/fail/rem (15,11,0,4) net: n24
+route: iter 2/40  nets tot/suc/fail/rem (15,12,0,3) net: n25a
+route: iter 2/40  nets tot/suc/fail/rem (15,13,0,2) net: n25b
+route: iter 2/40  nets tot/suc/fail/rem (15,14,0,1) net: n25c
+route: iter 2/40  nets tot/suc/fail/rem (15,15,0,0) net: nout
+update_historical_cost()
+finished routing iteration current overusage: 4.000000
+	rsrc w_c_i_3_2_c_o_3_2 COST=1.9 pn=1.3 hn=0.4 bn=1.0 OVERUSAGE 2.0[n21,n20]
+	rsrc w_c_o_3_2-c_i_0_1 COST=1.9 pn=1.3 hn=0.4 bn=1.0 OVERUSAGE 2.0[n21,n20]
+XXX Pathfinder: routing iteration 2
+route: iter 3/40  nets tot/suc/fail/rem (15,1,0,14) net: nin
+route: iter 3/40  nets tot/suc/fail/rem (15,2,0,13) net: nopt230
+route: iter 3/40  nets tot/suc/fail/rem (15,3,0,12) net: nopt231
+route: iter 3/40  nets tot/suc/fail/rem (15,4,0,11) net: nopt232
+route: iter 3/40  nets tot/suc/fail/rem (15,5,0,10) net: n5
+route: iter 3/40  nets tot/suc/fail/rem (15,6,0,9) net: n18
+route: iter 3/40  nets tot/suc/fail/rem (15,7,0,8) net: n20
+route: iter 3/40  nets tot/suc/fail/rem (15,8,0,7) net: n21
+route: iter 3/40  nets tot/suc/fail/rem (15,9,0,6) net: n22
+route: iter 3/40  nets tot/suc/fail/rem (15,10,0,5) net: n23
+route: iter 3/40  nets tot/suc/fail/rem (15,11,0,4) net: n24
+route: iter 3/40  nets tot/suc/fail/rem (15,12,0,3) net: n25a
+route: iter 3/40  nets tot/suc/fail/rem (15,13,0,2) net: n25b
+route: iter 3/40  nets tot/suc/fail/rem (15,14,0,1) net: n25c
+route: iter 3/40  nets tot/suc/fail/rem (15,15,0,0) net: nout
+update_historical_cost()
+finished routing iteration current overusage: 4.000000
+	rsrc w_c_i_3_2_c_o_3_2 COST=2.2 pn=1.3 hn=0.6 bn=1.0 OVERUSAGE 2.0[n21,n20]
+	rsrc w_c_o_3_2-c_i_0_1 COST=2.2 pn=1.3 hn=0.6 bn=1.0 OVERUSAGE 2.0[n21,n20]
+XXX Pathfinder: routing iteration 3
+route: iter 4/40  nets tot/suc/fail/rem (15,1,0,14) net: nin
+route: iter 4/40  nets tot/suc/fail/rem (15,2,0,13) net: nopt230
+route: iter 4/40  nets tot/suc/fail/rem (15,3,0,12) net: nopt231
+route: iter 4/40  nets tot/suc/fail/rem (15,4,0,11) net: nopt232
+route: iter 4/40  nets tot/suc/fail/rem (15,5,0,10) net: n5
+route: iter 4/40  nets tot/suc/fail/rem (15,6,0,9) net: n18
+route: iter 4/40  nets tot/suc/fail/rem (15,7,0,8) net: n20
+route: iter 4/40  nets tot/suc/fail/rem (15,8,0,7) net: n21
+route: iter 4/40  nets tot/suc/fail/rem (15,9,0,6) net: n22
+route: iter 4/40  nets tot/suc/fail/rem (15,10,0,5) net: n23
+route: iter 4/40  nets tot/suc/fail/rem (15,11,0,4) net: n24
+route: iter 4/40  nets tot/suc/fail/rem (15,12,0,3) net: n25a
+route: iter 4/40  nets tot/suc/fail/rem (15,13,0,2) net: n25b
+route: iter 4/40  nets tot/suc/fail/rem (15,14,0,1) net: n25c
+route: iter 4/40  nets tot/suc/fail/rem (15,15,0,0) net: nout
+update_historical_cost()
+finished routing iteration current overusage: 4.000000
+	rsrc w_c_i_3_2_c_o_3_2 COST=2.4 pn=1.3 hn=0.8 bn=1.0 OVERUSAGE 2.0[n21,n20]
+	rsrc w_c_o_3_2-c_i_0_1 COST=2.4 pn=1.3 hn=0.8 bn=1.0 OVERUSAGE 2.0[n21,n20]
+XXX Pathfinder: routing iteration 4
+route: iter 5/40  nets tot/suc/fail/rem (15,1,0,14) net: nin
+route: iter 5/40  nets tot/suc/fail/rem (15,2,0,13) net: nopt230
+route: iter 5/40  nets tot/suc/fail/rem (15,3,0,12) net: nopt231
+route: iter 5/40  nets tot/suc/fail/rem (15,4,0,11) net: nopt232
+route: iter 5/40  nets tot/suc/fail/rem (15,5,0,10) net: n5
+route: iter 5/40  nets tot/suc/fail/rem (15,6,0,9) net: n18
+route: iter 5/40  nets tot/suc/fail/rem (15,7,0,8) net: n20
+route: iter 5/40  nets tot/suc/fail/rem (15,8,0,7) net: n21
+route: iter 5/40  nets tot/suc/fail/rem (15,9,0,6) net: n22
+route: iter 5/40  nets tot/suc/fail/rem (15,10,0,5) net: n23
+route: iter 5/40  nets tot/suc/fail/rem (15,11,0,4) net: n24
+route: iter 5/40  nets tot/suc/fail/rem (15,12,0,3) net: n25a
+route: iter 5/40  nets tot/suc/fail/rem (15,13,0,2) net: n25b
+route: iter 5/40  nets tot/suc/fail/rem (15,14,0,1) net: n25c
+route: iter 5/40  nets tot/suc/fail/rem (15,15,0,0) net: nout
+update_historical_cost()
+finished routing iteration current overusage: 4.000000
+	rsrc w_c_i_3_2_c_o_3_2 COST=2.7 pn=1.3 hn=1.0 bn=1.0 OVERUSAGE 2.0[n21,n20]
+	rsrc w_c_o_3_2-c_i_0_1 COST=2.7 pn=1.3 hn=1.0 bn=1.0 OVERUSAGE 2.0[n21,n20]
+XXX Pathfinder: routing iteration 5
+route: iter 6/40  nets tot/suc/fail/rem (15,1,0,14) net: nin
+route: iter 6/40  nets tot/suc/fail/rem (15,2,0,13) net: nopt230
+route: iter 6/40  nets tot/suc/fail/rem (15,3,0,12) net: nopt231
+route: iter 6/40  nets tot/suc/fail/rem (15,4,0,11) net: nopt232
+route: iter 6/40  nets tot/suc/fail/rem (15,5,0,10) net: n5
+route: iter 6/40  nets tot/suc/fail/rem (15,6,0,9) net: n18
+route: iter 6/40  nets tot/suc/fail/rem (15,7,0,8) net: n20
+route: iter 6/40  nets tot/suc/fail/rem (15,8,0,7) net: n21
+route: iter 6/40  nets tot/suc/fail/rem (15,9,0,6) net: n22
+route: iter 6/40  nets tot/suc/fail/rem (15,10,0,5) net: n23
+route: iter 6/40  nets tot/suc/fail/rem (15,11,0,4) net: n24
+route: iter 6/40  nets tot/suc/fail/rem (15,12,0,3) net: n25a
+route: iter 6/40  nets tot/suc/fail/rem (15,13,0,2) net: n25b
+route: iter 6/40  nets tot/suc/fail/rem (15,14,0,1) net: n25c
+route: iter 6/40  nets tot/suc/fail/rem (15,15,0,0) net: nout
+update_historical_cost()
+finished routing iteration current overusage: 4.000000
+	rsrc w_c_i_3_2_c_o_3_2 COST=3.0 pn=1.3 hn=1.2 bn=1.0 OVERUSAGE 2.0[n21,n20]
+	rsrc w_c_o_3_2-c_i_0_1 COST=3.0 pn=1.3 hn=1.2 bn=1.0 OVERUSAGE 2.0[n21,n20]
+XXX Pathfinder: routing iteration 6
+route: iter 7/40  nets tot/suc/fail/rem (15,1,0,14) net: nin
+route: iter 7/40  nets tot/suc/fail/rem (15,2,0,13) net: nopt230
+route: iter 7/40  nets tot/suc/fail/rem (15,3,0,12) net: nopt231
+route: iter 7/40  nets tot/suc/fail/rem (15,4,0,11) net: nopt232
+route: iter 7/40  nets tot/suc/fail/rem (15,5,0,10) net: n5
+route: iter 7/40  nets tot/suc/fail/rem (15,6,0,9) net: n18
+route: iter 7/40  nets tot/suc/fail/rem (15,7,0,8) net: n20
+route: iter 7/40  nets tot/suc/fail/rem (15,8,0,7) net: n21
+route: iter 7/40  nets tot/suc/fail/rem (15,9,0,6) net: n22
+route: iter 7/40  nets tot/suc/fail/rem (15,10,0,5) net: n23
+route: iter 7/40  nets tot/suc/fail/rem (15,11,0,4) net: n24
+route: iter 7/40  nets tot/suc/fail/rem (15,12,0,3) net: n25a
+route: iter 7/40  nets tot/suc/fail/rem (15,13,0,2) net: n25b
+route: iter 7/40  nets tot/suc/fail/rem (15,14,0,1) net: n25c
+route: iter 7/40  nets tot/suc/fail/rem (15,15,0,0) net: nout
+update_historical_cost()
+finished routing iteration current overusage: 4.000000
+	rsrc w_c_i_3_2_c_o_3_2 COST=3.2 pn=1.3 hn=1.4 bn=1.0 OVERUSAGE 2.0[n21,n20]
+	rsrc w_c_o_3_2-c_i_0_1 COST=3.2 pn=1.3 hn=1.4 bn=1.0 OVERUSAGE 2.0[n21,n20]
+XXX Pathfinder: routing iteration 7
+route: iter 8/40  nets tot/suc/fail/rem (15,1,0,14) net: nin
+route: iter 8/40  nets tot/suc/fail/rem (15,2,0,13) net: nopt230
+route: iter 8/40  nets tot/suc/fail/rem (15,3,0,12) net: nopt231
+route: iter 8/40  nets tot/suc/fail/rem (15,4,0,11) net: nopt232
+route: iter 8/40  nets tot/suc/fail/rem (15,5,0,10) net: n5
+route: iter 8/40  nets tot/suc/fail/rem (15,6,0,9) net: n18
+route: iter 8/40  nets tot/suc/fail/rem (15,7,0,8) net: n20
+route: iter 8/40  nets tot/suc/fail/rem (15,8,0,7) net: n21
+route: iter 8/40  nets tot/suc/fail/rem (15,9,0,6) net: n22
+route: iter 8/40  nets tot/suc/fail/rem (15,10,0,5) net: n23
+route: iter 8/40  nets tot/suc/fail/rem (15,11,0,4) net: n24
+route: iter 8/40  nets tot/suc/fail/rem (15,12,0,3) net: n25a
+route: iter 8/40  nets tot/suc/fail/rem (15,13,0,2) net: n25b
+route: iter 8/40  nets tot/suc/fail/rem (15,14,0,1) net: n25c
+route: iter 8/40  nets tot/suc/fail/rem (15,15,0,0) net: nout
+update_historical_cost()
+finished routing iteration current overusage: 4.000000
+	rsrc w_c_i_3_2_c_o_3_2 COST=3.5 pn=1.3 hn=1.6 bn=1.0 OVERUSAGE 2.0[n21,n20]
+	rsrc w_c_o_3_2-c_i_0_1 COST=3.5 pn=1.3 hn=1.6 bn=1.0 OVERUSAGE 2.0[n21,n20]
+XXX Pathfinder: routing iteration 8
+route: iter 9/40  nets tot/suc/fail/rem (15,1,0,14) net: nin
+route: iter 9/40  nets tot/suc/fail/rem (15,2,0,13) net: nopt230
+route: iter 9/40  nets tot/suc/fail/rem (15,3,0,12) net: nopt231
+route: iter 9/40  nets tot/suc/fail/rem (15,4,0,11) net: nopt232
+route: iter 9/40  nets tot/suc/fail/rem (15,5,0,10) net: n5
+route: iter 9/40  nets tot/suc/fail/rem (15,6,0,9) net: n18
+route: iter 9/40  nets tot/suc/fail/rem (15,7,0,8) net: n20
+route: iter 9/40  nets tot/suc/fail/rem (15,8,0,7) net: n21
+route: iter 9/40  nets tot/suc/fail/rem (15,9,0,6) net: n22
+route: iter 9/40  nets tot/suc/fail/rem (15,10,0,5) net: n23
+route: iter 9/40  nets tot/suc/fail/rem (15,11,0,4) net: n24
+route: iter 9/40  nets tot/suc/fail/rem (15,12,0,3) net: n25a
+route: iter 9/40  nets tot/suc/fail/rem (15,13,0,2) net: n25b
+route: iter 9/40  nets tot/suc/fail/rem (15,14,0,1) net: n25c
+route: iter 9/40  nets tot/suc/fail/rem (15,15,0,0) net: nout
+update_historical_cost()
+finished routing iteration(no overusage)
+ROUTING SUCCEDED: after 9 iterations
+****** Routing succeeded in iteration 1 : 1 
+===========================================================================
+= Netlist successfully routed
+=   Outer placer iterations: 1  (max: 50)
+=   Inner placer iterations: 1  (max: 50)
+===========================================================================
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Routed netlist:
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+net: nin
+	routing status: routed
+	wire 0:
+		from:in [p_i.0 constr:fixed]	to:op5 [c_3_0 constr:initial]
+		sourcePort: in
+		sinkPort: op5.i.0
+		path: 
+			[p_i.0,
+			b_i.0,
+			s_b_i.0-b_hn.3.1,
+			b_hn.3.1,
+			w_b_hn.3.1-c_i_3_0,
+			c_i_3_0
+			]
+		pathcost: 5
+net: nopt230
+	routing status: routed
+	wire 0:
+		from:opt230 [c_1_0 constr:fixed]	to:op18 [c_3_1 constr:initial]
+		sourcePort: opt230.o.0
+		sinkPort: op18.i.1
+		path: 
+			[c_o_1_0,
+			w_c_o_1_0-c_i_1_1,
+			s_w_c_o_1_0-c_i_1_1-b_ve.0.1,
+			b_ve.0.1,
+			w_b_ve.0.1-c_i_3_1,
+			c_i_3_1
+			]
+		pathcost: 5
+net: nopt231
+	routing status: routed
+	wire 0:
+		from:opt231 [c_2_0 constr:fixed]	to:op18 [c_3_1 constr:initial]
+		sourcePort: opt231.o.0
+		sinkPort: op18.i.0
+		path: 
+			[c_o_2_0,
+			w_c_o_2_0-c_i_3_1,
+			c_i_3_1
+			]
+		pathcost: 2
+net: nopt232
+	routing status: routed
+	wire 0:
+		from:opt232 [c_0_0 constr:fixed]	to:op18 [c_3_1 constr:initial]
+		sourcePort: opt232.o.0
+		sinkPort: op18.i.2
+		path: 
+			[c_o_0_0,
+			w_c_o_0_0-c_i_3_1,
+			c_i_3_1
+			]
+		pathcost: 2
+net: n5
+	routing status: routed
+	wire 0:
+		from:op5 [c_3_0 constr:initial]	to:op22 [c_0_1 constr:initial]
+		sourcePort: op5.o.0
+		sinkPort: op22.i.2
+		path: 
+			[c_o_3_0,
+			w_c_o_3_0-c_i_0_1,
+			c_i_0_1
+			]
+		pathcost: 2
+net: n18
+	routing status: routed
+	wire 0:
+		from:op18 [c_3_1 constr:initial]	to:op20 [c_2_1 constr:initial]
+		sourcePort: op18.o.0
+		sinkPort: op20.i.0
+		path: 
+			[c_o_3_1,
+			w_c_o_3_1-c_i_2_1,
+			c_i_2_1
+			]
+		pathcost: 2
+	wire 1:
+		from:op18 [c_3_1 constr:initial]	to:op21 [c_2_2 constr:initial]
+		sourcePort: op18.o.0
+		sinkPort: op21.i.1
+		path: 
+			[c_o_3_1,
+			w_c_o_3_1-c_i_2_2,
+			c_i_2_2
+			]
+		pathcost: 2
+net: n20
+	routing status: routed
+	wire 0:
+		from:op20 [c_2_1 constr:initial]	to:op22 [c_0_1 constr:initial]
+		sourcePort: op20.o.0
+		sinkPort: op22.i.0
+		path: 
+			[c_o_2_1,
+			w_c_o_2_1-c_i_3_2,
+			c_i_3_2,
+			w_c_i_3_2_c_o_3_2,
+			c_o_3_2,
+			w_c_o_3_2-c_i_0_1,
+			c_i_0_1
+			]
+		pathcost: 9
+net: n21
+	routing status: routed
+	wire 0:
+		from:op21 [c_2_2 constr:initial]	to:op22 [c_0_1 constr:initial]
+		sourcePort: op21.o.0
+		sinkPort: op22.i.1
+		path: 
+			[c_o_2_2,
+			w_c_o_2_2-c_i_3_3,
+			c_i_3_3,
+			w_c_i_3_3_c_o_3_3,
+			c_o_3_3,
+			w_c_o_3_3-c_i_0_3,
+			s_w_c_o_3_3-c_i_0_3-b_hn.0.0,
+			b_hn.0.0,
+			w_b_hn.0.0-c_i_0_1,
+			c_i_0_1
+			]
+		pathcost: 9
+net: n22
+	routing status: routed
+	wire 0:
+		from:op22 [c_0_1 constr:initial]	to:op24 [c_1_1 constr:initial]
+		sourcePort: op22.o.0
+		sinkPort: op24.i.0
+		path: 
+			[c_o_0_1,
+			w_c_o_0_1-c_i_1_1,
+			c_i_1_1
+			]
+		pathcost: 2
+	wire 1:
+		from:op22 [c_0_1 constr:initial]	to:op23 [c_1_3 constr:initial]
+		sourcePort: op22.o.0
+		sinkPort: op23.i.0
+		path: 
+			[c_o_0_1,
+			w_c_o_0_1-c_i_1_1,
+			s_w_c_o_0_1-c_i_1_1-b_hn.1.0,
+			b_hn.1.0,
+			w_b_hn.1.0-c_i_1_3,
+			c_i_1_3
+			]
+		pathcost: 5
+	wire 2:
+		from:op22 [c_0_1 constr:initial]	to:op25b [c_0_2 constr:initial]
+		sourcePort: op22.o.0
+		sinkPort: op25b.i.0
+		path: 
+			[c_o_0_1,
+			w_c_o_0_1-c_i_0_2,
+			c_i_0_2
+			]
+		pathcost: 2
+net: n23
+	routing status: routed
+	wire 0:
+		from:op23 [c_1_3 constr:initial]	to:op25a [c_2_3 constr:initial]
+		sourcePort: op23.o.0
+		sinkPort: op25a.i.2
+		path: 
+			[c_o_1_3,
+			w_c_o_1_3-c_i_2_3,
+			c_i_2_3
+			]
+		pathcost: 2
+	wire 1:
+		from:op23 [c_1_3 constr:initial]	to:op25b [c_0_2 constr:initial]
+		sourcePort: op23.o.0
+		sinkPort: op25b.i.2
+		path: 
+			[c_o_1_3,
+			w_c_o_1_3-c_i_0_2,
+			c_i_0_2
+			]
+		pathcost: 2
+net: n24
+	routing status: routed
+	wire 0:
+		from:op24 [c_1_1 constr:initial]	to:op25c [c_1_2 constr:initial]
+		sourcePort: op24.o.0
+		sinkPort: op25c.i.2
+		path: 
+			[c_o_1_1,
+			w_c_o_1_1-c_i_1_2,
+			c_i_1_2
+			]
+		pathcost: 2
+net: n25a
+	routing status: routed
+	wire 0:
+		from:op25a [c_2_3 constr:initial]	to:op25c [c_1_2 constr:initial]
+		sourcePort: op25a.o.0
+		sinkPort: op25c.i.1
+		path: 
+			[c_o_2_3,
+			w_c_o_2_3-c_i_1_2,
+			c_i_1_2
+			]
+		pathcost: 2
+net: n25b
+	routing status: routed
+	wire 0:
+		from:op25b [c_0_2 constr:initial]	to:op25c [c_1_2 constr:initial]
+		sourcePort: op25b.o.0
+		sinkPort: op25c.i.0
+		path: 
+			[c_o_0_2,
+			w_c_o_0_2-c_i_1_2,
+			c_i_1_2
+			]
+		pathcost: 2
+net: n25c
+	routing status: routed
+	wire 0:
+		from:op25c [c_1_2 constr:initial]	to:obuf [c_0_3 constr:initial]
+		sourcePort: op25c.o.0
+		sinkPort: obuf.i.0
+		path: 
+			[c_o_1_2,
+			w_c_o_1_2-c_i_0_3,
+			c_i_0_3
+			]
+		pathcost: 2
+	wire 1:
+		from:op25c [c_1_2 constr:initial]	to:op20 [c_2_1 constr:initial]
+		sourcePort: op25c.o.0
+		sinkPort: op20.i.1
+		path: 
+			[c_o_1_2,
+			w_c_o_1_2-c_i_2_1,
+			c_i_2_1
+			]
+		pathcost: 2
+	wire 2:
+		from:op25c [c_1_2 constr:initial]	to:op21 [c_2_2 constr:initial]
+		sourcePort: op25c.o.0
+		sinkPort: op21.i.0
+		path: 
+			[c_o_1_2,
+			w_c_o_1_2-c_i_2_2,
+			c_i_2_2
+			]
+		pathcost: 2
+net: nout
+	routing status: routed
+	wire 0:
+		from:obuf [c_0_3 constr:initial]	to:out [p_o.1 constr:fixed]
+		sourcePort: obuf.o.0
+		sinkPort: out
+		path: 
+			[c_o_0_3,
+			w_c_o_0_3-c_i_1_3,
+			s_w_c_o_0_3-c_i_1_3-b_hn.1.1,
+			b_hn.1.1,
+			w_b_hn.1.1-m_o.1,
+			m_o.1,
+			w_o.1,
+			p_o.1
+			]
+		pathcost: 7
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Placement only:
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+c obuf cell c_0_3:i
+c op18 cell c_3_1:i
+c op20 cell c_2_1:i
+c op21 cell c_2_2:i
+c op22 cell c_0_1:i
+c op23 cell c_1_3:i
+c op24 cell c_1_1:i
+c op25a cell c_2_3:i
+c op25b cell c_0_2:i
+c op25c cell c_1_2:i
+c op5 cell c_3_0:i
+c opt230 cell c_1_0:f
+c opt231 cell c_2_0:f
+c opt232 cell c_0_0:f
+insert feedtrough cell at c_3_2 with feedWire:w_c_o_2_1-c_i_3_2 driveWire:c_i_0_1
+insert feedtrough cell at c_3_3 with feedWire:w_c_o_2_2-c_i_3_3 driveWire:s_w_c_o_3_3-c_i_0_3-b_hn.0.0
