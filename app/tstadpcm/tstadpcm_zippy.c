@@ -1,10 +1,10 @@
-#define DEBUG 0
+#define DEBUG 1
 
 #define DEBUG_FIFO_WRITE 0
 
 #define DEBUG_CFG_DOWNLOAD 0
 
-#define VERIFICATION 0
+#define VERIFICATION 1
 
 #define DEBUG_DUMPRES 0
 
@@ -194,8 +194,9 @@ int main(int argc, char *argv[])
 #if DEBUG
     printf("iteration: %d of %d ------------ \n",iter,maxiter);
 #endif
-    
-     /******* fill FIFO_0 with input data *************/
+
+
+#if 1
      for(i=0;i<ADPCMLEN_SAMPLES;i++) {
        j = i >> 1;
        if (( i % 2) == 1){
@@ -203,13 +204,14 @@ int main(int argc, char *argv[])
        } else {
          sample = (adpcmData[j] >> 4) & 0xf;
        }
-
-#if DEBUG_FIFO_WRITE
-       printf("write sample %d val: 0x%1X\n",i,sample);
-#endif
        zippy_set_reg(ZREG_FIFO0,sample);
      }
-      
+#else
+#include "fifo_write.h"    
+#endif     
+
+
+     
 #if DEBUG  
      printf("\nFIFO_0 fill level = %d\n\n", zippy_get_reg(ZREG_FIFO0LEV));
 #endif
