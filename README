@@ -1,0 +1,3 @@
+Zippy is a detailed simulation model for a reconfigurable CPU architecture that has been developed in the Zippy Research Project at ETH Zurich.
+
+Zippy consists of a CPU that is interfaced to a coarse-grained, dynamically reconfigurable array. The CPU is simulated with the SimpleScalar CPU simulator, the reconfigurable array is specified as cycle accurate VHDL model. These models are integrated with a co-simulation environment into a cycle-accurate, system-level co-simulation framework.
