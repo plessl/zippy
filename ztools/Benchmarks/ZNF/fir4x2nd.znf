@@ -1,0 +1,76 @@
+znf 0.1 fir4x2nd
+# cascade of 4 2nd-order FIR filters
+#
+#        |
+#  /----------\
+# OP1         OP2
+# MUL         Delay+MUL
+#  \           /
+#   --      --
+#      OP3
+#      ADD+Delay
+#        |
+#  /----------\
+# OP4         OP5
+# MUL         Delay+MUL
+#  \           /
+#   --      --
+#      OP6
+#      ADD+Delay
+#        |
+#  /----------\
+# OP7         OP8
+# MUL         Delay+MUL
+#  \           /
+#   --      --
+#      OP9
+#      ADD+Delay
+#
+#        |
+#  /----------\
+# OP10        OP11
+# MUL         Delay+MUL
+#  \           /
+#   --      --
+#      OP12
+#      ADD+Delay
+
+i in  p_i.0:f
+
+o out p_o.0:f
+
+c op1  std *
+c op2  std *
+c op3  std *
+c op4  std *
+c op5  std *
+c op6  std *
+c op7  std *
+c op8  std *
+c op9  std *
+c op10 std *
+c op11 std *
+c op12 std *
+
+# cascade 1
+n nin		in   op1,op2
+n no1o3		op1  op3
+n no2o3		op2  op3
+
+# cascade 2
+n no3o4o5   op3  op4,op5
+n no4o6		op4  op6
+n no5o6		op5  op6
+
+# cascade 3
+n no6o7o8   op6  op7,op8
+n no7o9		op7  op9
+n no8o9		op8  op9
+
+# cascade 4
+n no9o10o11 op9  op10,op11
+n no10o12	op10 op12
+n no11o12	op11 op12
+
+#output
+n nout	op12	out

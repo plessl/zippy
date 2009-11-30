@@ -1,0 +1,506 @@
+#!/usr/bin/env perl
+
+use Getopt::Long;
+use Pod::Usage;
+use strict;
+use warnings;
+use English;
+use FileHandle;
+use Carp;
+
+use Data::Dumper;
+use Zippy::Netlist::Netlist;
+use Zippy::Netlist::Node;
+use Zippy::Netlist::Net;
+use Zippy::Netlist::Wire;
+use Zippy::Netlist::Znf;
+use Zippy::Netlist::ZippyConfiguration;
+use Zippy::Architecture::RoutingGraph;
+use Zippy::Architecture::Placer;
+use Zippy::Architecture::Router;
+
+my $znfFilename = '';
+my $znfOutputFilename = '';
+my $vhdlOutputFilename = '';
+my $logfile;
+my $architecture = '';
+my $maxRoutingIterations = 40;
+my $maxPlacementIterInner = 20;
+my $maxPlacementIterOuter = 20;
+my $temperature = 0.5;
+my $temperatureUpdate = 0.96;
+my $svgdump = 0;
+my $nldot;
+my $verbose = 0;
+my $man = 0;
+my $reachabilitygraphfile;
+my $reachabilitygraph = 0;
+my $alpha_con = 5;
+
+srand(0);   ## initialize random generator
+
+my @args = @ARGV;
+
+#$0 = "zroute";
+# enable autoflushing usefull piping output of programm through 'tee' 
+$OUTPUT_AUTOFLUSH = 1;
+
+if (not scalar @ARGV) {
+    print "scalar \@ARGV is " . scalar @ARGV . "\n";
+    print STDERR "no arguments passed to $0\n";
+    pod2usage(0); 
+}
+
+my $result = GetOptions (
+    'netlist=s'  => \$znfFilename,
+    'out:s'		 => \$znfOutputFilename,
+    'vhdlout:s'  => \$vhdlOutputFilename,
+    'logfile:s'  => \$logfile,
+    'architecture:s' => \$architecture,
+    'svg'        => \$svgdump,
+    'nldot:s'    => \$nldot,
+    'ri:i'       => \$maxRoutingIterations,
+    'pii:i'      => \$maxPlacementIterInner,
+    'pio:i'      => \$maxPlacementIterOuter,
+    't:f'        => \$temperature,
+    'tu:f'       => \$temperatureUpdate,
+    'alphacon'   => \$alpha_con,
+    'rgfile:s'   => \$reachabilitygraphfile,
+    'rg'         => \$reachabilitygraph,
+    'verbose+'   => \$verbose,
+    'help|?'     => \$man
+);
+
+
+if ($svgdump){
+    print Zippy::Architecture::RoutingGraph::create_RoutingGraph_SVG();
+    exit 1;
+}
+
+if ($znfFilename eq '') {
+    print "no netlist specified!\n";
+    pod2usage(-verbose => 2);
+}
+
+pod2usage(-verbose => 2) if $man;
+
+
+#if ($verbose >0) {
+    print '=' x 75 . "\n";
+    print sprintf("command line: %s\n",join(" ",@args));
+    print '=' x 75 . "\n";
+    print sprintf("netlist name:                   %s\n",$znfFilename);
+    print sprintf("architecture definition file    %s\n",$architecture);
+    print sprintf("output filename:                %s\n",$znfOutputFilename);
+    print sprintf("VHDL output filename:           %s\n",$vhdlOutputFilename);
+    print sprintf("max routing iterations:         %d\n",$maxRoutingIterations);
+    print sprintf("max inner placement iterations: %d\n",$maxPlacementIterInner);
+    print sprintf("max outer placement iterations: %d\n",$maxPlacementIterOuter);
+    print sprintf("temperature:                    %f\n",$temperature);
+    print sprintf("temperatureUpdate:              %f\n",$temperatureUpdate);
+    print sprintf("verbose level:                  %d\n",$verbose);
+    print '=' x 75 . "\n\n";
+#}
+
+
+if (! -f $znfFilename){ die "Not a valid filename $znfFilename: $!"; }
+if ($temperatureUpdate > 1) { die "Temperature update factor must be <1!"; }
+
+my $fhLogfile = new FileHandle;
+if ((defined $logfile) and ($logfile ne '')){
+    $fhLogfile->open($logfile,"w");
+    die "cannot open $logfile for writing, @!" unless $fhLogfile;
+}
+
+my $fhVhdlOutputFile = new FileHandle;
+if ((defined $fhVhdlOutputFile) and ($vhdlOutputFilename ne '')){
+    $fhVhdlOutputFile->open($vhdlOutputFilename,'w');
+    if (not $fhVhdlOutputFile){
+        die "cannot open $vhdlOutputFilename for configuration output, @!";
+    }
+}
+
+############ new SA placer code ##############################
+
+
+my $rg = Zippy::Architecture::RoutingGraph->new(archfile => $architecture);
+my $znf = Zippy::Netlist::Znf->new('infile' => $znfFilename);
+my $nl = $znf->getNetlist;
+
+if (defined $nldot){
+    print "dumping netlist to $nldot\n";
+    my $fhNetlistDot = new FileHandle;
+    if ($fhNetlistDot->open("> $nldot")){
+        print $nl;
+        print $fhNetlistDot Tools::GraphTools::dumpGraphAsDot($nl->getGraph);
+        $fhNetlistDot->close;
+    } else {
+        die "cannot open $nldot: $!";
+    }
+    print "done.\n";
+    print "further processing with dot, e.g:\n";
+    print "dot -Tps /tmp/test.dot > /tmp/test.ps\n";
+    print "ps2pdf /tmp/test.ps /tmp/test.pdf\n";
+    print "open /tmp/test.pdf\n";
+    exit(0);
+} 
+
+
+my $placer = Zippy::Architecture::Placer->new(routinggraph => $rg, netlist => $nl);
+my $router = Zippy::Architecture::Router->new(routinggraph => $rg, netlist => $nl, 
+    maxiter => $maxRoutingIterations);
+
+my $routingResult;
+
+$placer->init();
+
+if ($reachabilitygraph){    
+    print ("computing reachability of cells (feasible routing)\n");
+    $placer->computeFeasibleRoutings($reachabilitygraphfile);
+}
+
+if (not $placer->valid_placement) {
+    die "print initial placement not valid"; 
+}
+
+my %archive;
+my $netsTotal = $nl->netsTotal;
+$archive{bestOverusage} = 0;   ## FIXME, find better initialization value
+$archive{bestUnroutedNets} = $nl->netsTotal;
+$archive{bestMapCellNameToSite} = $placer->{mapCellNameToSite};
+$archive{bestMapSiteToCellName} = $placer->{mapSiteToCellName};
+
+my $unroutedNets;
+my $outer;       # iterations of placer in outer SA loop
+my $inner;       # inerations of placer in inner SA loop
+
+my $arSwapped;   # cells swapped in this iteration
+
+SALOOP: for($outer=1; $outer<=$maxPlacementIterOuter; $outer++){
+   
+    INNERLOOP: for($inner=1; $inner<=$maxPlacementIterInner;$inner++){
+
+    print "%" x 70 . "\n";
+    print sprintf("%% Place and Route: Outer Iteration: %s/%s  Inner Iteration %s/%s\n",
+        $outer,$maxPlacementIterOuter,$inner,$maxPlacementIterInner);
+    print "% Temperature = $temperature\n";
+    print sprintf("%% Best Routing:  %d of %d nets routed\n",$netsTotal - $archive{bestUnroutedNets},$netsTotal);
+    print "%" x 70 . "\n\n";
+
+    $router->nl->resetRouting;
+    
+    if (not (($inner == 1) and ($outer == 1)) ) {
+        $arSwapped = $placer->randomMove(1);
+        #print Dumper($arSwapped);
+    } else {
+       print "No random move at very first iteration!\n";
+    }
+    $placer->nl->pp;
+    
+    if ($placer->valid_placement()) {
+        print "Netlist has a valid placement.\n";
+    } else {
+        die "Netlist does not have a valid placement!";
+    }
+
+
+my $deltaCost;
+my $currentUnrouted;
+my $currentOverusage;
+my ($currentCost,$currentCostUnrouted,$currentCostOverusage);
+my ($bestCost,$bestCostUnrouted,$bestCostOverusage);
+
+if ($reachabilitygraph and ($placer->routablePlacement != 1)) {
+        $routingResult = $Zippy::Architecture::Router::ROUTER_FAILED_UNREACHABLE;
+        $currentUnrouted = -$placer->routablePlacement;
+        $currentOverusage = 0;
+} else {
+
+ 	   my $hrMapSiteToCellName = $placer->{mapSiteToCellName};
+ 	   my @unusedCellNames;
+ 	   foreach my $site ( keys %{ $hrMapSiteToCellName } ) {
+ 	       #print sprintf("site: %s is mapped to cell: %s\n",$site,$hrMapSiteToCellName->{$site});
+ 	       if ($hrMapSiteToCellName->{$site} eq "unused"){
+ 	           push @unusedCellNames,$site;
+ 	       }
+ 	   }
+    
+ 	   ### enable cell feedthrough routing
+ 	   #foreach my $cellName ( @unusedCellNames ) {
+ 	   #    $router->rg->enableLogicFeedthrough($cellName);
+ 	   #}
+
+       map { $router->rg->enableLogicFeedthrough($_)  } @unusedCellNames;
+ 	   $routingResult = $router->route_pathfinder();
+       map { $router->rg->disableLogicFeedthrough($_) } @unusedCellNames;
+
+ 	   ### disable cell feedthrough routing
+ 	   #foreach my $cellName ( @unusedCellNames ) {
+ 	   #    $router->rg->disableLogicFeedthrough($cellName);
+ 	   #}
+
+ 	   if ($routingResult == $Zippy::Architecture::Router::ROUTER_SUCCESS) {
+ 	       print "****** Routing succeeded in iteration $outer : $inner \n";
+ 	       last SALOOP;
+ 	   } elsif ($routingResult == $Zippy::Architecture::Router::ROUTER_FAILED_OVERUSAGE) {
+ 	       print "****** Routing failed for current placement because of congestions (overusage)\n";
+ 	       print sprintf("****** Total overusage was: %d\n",$router->rg->resource_total_overusage);
+ 	       print "****** Create new placement\n";
+	   } elsif ($routingResult == $Zippy::Architecture::Router::ROUTER_FAILED_UNREACHABLE) {
+	       print "****** Routing failed for current placement because certain nodes are unreachable\n";
+	        print sprintf("****** Routed %d of %d nets\n",$netsTotal - $router->nl->netsUnrouted,$netsTotal);
+    	    print "****** Create new placement\n";
+       } else {
+        	die "unknow result from router!";
+       }
+
+        $currentUnrouted = $router->nl->netsUnrouted;
+        
+        if ($routingResult == $Zippy::Architecture::Router::ROUTER_FAILED_OVERUSAGE){
+            $currentOverusage = $router->rg->resource_total_overusage;
+        } else {
+            $currentOverusage = 0;
+        }
+}
+
+    $currentCostUnrouted = $currentUnrouted;
+    $currentCostOverusage = 1 - exp(-$currentOverusage / $alpha_con);
+    $currentCost = ($currentCostUnrouted + $currentCostOverusage) / $router->nl->netsTotal; 
+
+    $bestCostUnrouted = $archive{bestUnroutedNets};
+    
+    # prevent anomaly of preferring a unroutable placement (without congestion) over a 
+    # routable placement with congestion
+    if ($currentCostUnrouted > 0){
+        $bestCostOverusage = 1 - exp(-$archive{bestOverusage} / $alpha_con);
+    } else {
+        $bestCostOverusage = 0;
+    }
+    $bestCost = ($bestCostUnrouted + $bestCostOverusage) / $router->nl->netsTotal;
+    
+    ## $deltaCost > 0  --> new solution is worse solution
+    ## $deltaCost < 0  --> new solution is better soultion
+    $deltaCost = $currentCost - $bestCost;
+
+    my $r = rand(1);
+    my $ex = exp(-$deltaCost/$temperature);
+    my $accept = ( $ex > $r) ? 1 : 0;
+    
+    if (($deltaCost < 0) and (not $accept)){
+        die sprintf("dC=%d temp=%f exp(-dC/temp)=%f rand=%f",$deltaCost,$temperature,$ex,$r);        
+    }
+    
+    my $str;
+
+    $str .= "%" x 70 . "\n";
+    $str .= sprintf("%% P&R status  oi: %s/%s ii: %s/%s t: %f\n",
+        $outer,$maxPlacementIterOuter,$inner,$maxPlacementIterInner,$temperature);
+
+    my $status;
+    $status = "ACCEPT and EQUAL   " if($accept and ($deltaCost == 0));
+    $status = "ACCEPT and BETTER  " if($accept and ($deltaCost < 0)); 
+    $status = "ACCEPT and WORSE   " if($accept and ($deltaCost > 0)); 
+    $status = "NOTACCEPT and WORSE" if(not $accept); 
+
+    $str .= sprintf ("%% %s\n",$status);
+    $str .= sprintf ("%% unrouted   curr: %5d  best: %5d  delta: %4d\n",
+        $currentUnrouted,$archive{bestUnroutedNets},$currentUnrouted-$archive{bestUnroutedNets});
+    $str .= sprintf ("%% overusage  curr: %2.3f  best: %2.3f\n",$currentOverusage, $archive{bestOverusage});
+    $str .= sprintf ("%% cost       curr: %2.3f  best: %2.3f  delta: %2.3f\n",
+        $currentCost,$bestCost,$deltaCost);
+    $str .= sprintf ("%% sa        dcost: %2.3f  ex:   %2.3f  rand:  %2.3f\n",$deltaCost,$ex,$r);
+    print $str;
+    
+    if ($accept){
+        $archive{bestUnroutedNets} = $currentUnrouted;
+        $archive{bestOverusage} = $currentOverusage;
+        $archive{bestMapCellNameToSite} = $placer->{mapCellNameToSite};
+        $archive{bestMapSiteToCellName} = $placer->{mapSiteToCellName};
+    } else {
+        $placer->{mapCellNameToSite} = $archive{bestMapCellNameToSite};
+        $placer->{mapSiteToCellName} = $archive{bestMapSiteToCellName};
+    }
+    
+    #format
+    #outerit:innerit:unrouted:total:overusage:temp
+    #FIXMEFIXME
+    #if ($logfile ne '')
+    #     $fhLogfile->fprintf("%d:%d:%d:%d:%f:%f\n",$outer,$inner,$
+    #}
+    
+    
+    }  ## inner loop
+    
+    # update temperature
+    $temperature = $temperature * $temperatureUpdate;
+}
+
+
+$outer = $maxPlacementIterOuter if ($outer > $maxPlacementIterOuter);
+$inner = $maxPlacementIterInner if ($inner > $maxPlacementIterInner);
+
+if ($routingResult == $Zippy::Architecture::Router::ROUTER_SUCCESS) {
+    print         "=" x 75 . "\n";
+    print        ("= Netlist successfully routed\n");
+    print sprintf("=   Outer placer iterations: %d  (max: %d)\n",$outer,$maxPlacementIterOuter);
+    print sprintf("=   Inner placer iterations: %d  (max: %d)\n",$inner,$maxPlacementIterInner);    
+    print         "=" x 75 . "\n";
+ } elsif ($routingResult == $Zippy::Architecture::Router::ROUTER_FAILED_OVERUSAGE) {
+    print         "=" x 75 . "\n";
+    print        ("= Netlist routing failed due to overusage of resources\n");
+    print sprintf("=   Outer placer iterations: %d  (max: %d)\n",$outer,$maxPlacementIterOuter);
+    print sprintf("=   Inner placer iterations: %d  (max: %d)\n",$inner,$maxPlacementIterInner);    
+    print sprintf("= Total overusage: %.2f\n",$router->rg->resource_total_overusage);
+    print         "=" x 75 . "\n";
+    print $router->rg->all_resources_overused_pp;
+ } elsif ($routingResult == $Zippy::Architecture::Router::ROUTER_FAILED_UNREACHABLE) {
+    print         "=" x 75 . "\n";
+    print         "= Netlist routing failed due to infeasible placement, certain cells not reachable\n";
+    print sprintf("= Routed %d of %d nets\n",$netsTotal - $router->nl->netsUnrouted,$netsTotal);
+    print         "=" x 75 . "\n";
+} else {
+    die "unknown result";
+}
+
+print "x" x 70 . "\n" . "Routed netlist:\n" . "x" x 70 . "\n";
+print $router->nl->pp();
+
+print "x" x 70 . "\n" . "Placement only:\n" . "x" x 70 . "\n";
+print $placer->prettyPrintWithFormat('ZNF_initial');
+
+if ($fhVhdlOutputFile ne ""){
+    my $abstrConf = $router->nl->getAbstractConfiguration;
+#    print Dumper($abstrConf);
+#    die;
+    my $VHDLConfig = Zippy::Netlist::ZippyConfiguration->new('zippyconf');
+    $VHDLConfig->abstractConfiguration($abstrConf);
+    my $vhdlConfigData = $VHDLConfig->ZippyVHDLConfiguration;
+	print $vhdlConfigData;
+    $fhVhdlOutputFile->print($vhdlConfigData);
+    $fhVhdlOutputFile->close;
+}
+
+__END__
+
+###################################################################################
+
+
+=head1 NAME
+
+zrouter.pl - a ZNF netlist router for the Zippy Architecture
+
+=head1 SYNOPSIS
+
+zrouter [options] --netlist nl.znf
+
+  Options:
+
+    IO options:
+        -netlist file    ZNF netlist to be routed
+        -out             filename for routed netlist
+        -vhdlout file    write VHDL configuration record for the ZIPPY 
+                         simulator to file
+
+    Architecture options:
+        -architecture file   architecture description file     
+  
+    Placer options:
+        -pii             number of inner placer iterations
+        -pio             number of outer placer iterations
+        -t               starting temperature for placer (sim. annealing)
+        -tu              update factor for temperature
+      
+    Router options:  
+        -ri              number of routing interations
+        -rg              use reachability graph to check whether placement is 
+                         routable at all
+        -rgfile file     use file to cache reachability graph information
+
+    
+    Visualization options:
+        -svg             create SVG graphics for the architecture
+        -nldot           dump netlist graph as dot-File
+    
+    Help options.
+        -v|-verbose      verbose output
+                         use -v -v for even more verbose (debug) output
+        -help            brief help message
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-netlist> file
+
+Specify the netlist to be routed on the Zippy Architecture. The netlist
+must be in the ZNF format (Zippy Netlist Format).
+
+
+=item B<-out> file
+
+Writes the routed netlist to file. If no file is specified the netlist is
+written to standard output
+
+
+=item B<-vhdl> file
+
+Writes a VHDL representation of the placed and routed netlist to the specified
+file. This VHDL file can be used in the simzippy simulator for simulation and 
+co-simulation of the implemented circuit.
+
+
+=item B<-architecture> file
+
+Use the target architecture specified in file
+
+
+=item B<-pio> pio
+
+Run the outer loop of the simulated annealing placed router for pio iterations
+at maximum. After each outer iteration the temperature is decreased.
+
+
+=item B<-pii> pii
+
+Run the inner loop of the placer for pii iterations. For each placer iteration the 
+router is running for maximum ri iterations until a valid placement and routing 
+is found. It is assumed, that pii is sufficiently large, that the simulated 
+annealing algorithm reaches the "thermodynamic equilibrium" within pii iteratinos.
+
+
+=item B<-ri> ri
+
+Run the router for ri time for every iteration of the placer or until a valid
+placement and routing has been found.
+
+
+=item B<-t> temp
+
+Initialize the temperature for the simmulated annealing algorithm to temp.
+
+
+=item B<-tu> tempupdate
+
+Decrease the temperature in every routing iteration by a factore of tempupdate.
+
+
+=item B<-verbose | -v>
+
+Activate verbose output. The verbosity can be increased be specifying multiple
+-v flags
+
+
+=back
+
+=head1 DESCRIPTION
+
+B<This program> will perform placement and routing of a ZNF netlist on the Zippy architecture.
+
+The following example shows a typical use of zroute:
+
+zroute -v -netlist Benchmarks/ZNF/fir2.znf \
+ -architecture Benchmarks/Architectures/4x4_small.arch \
+ -out "$RDIR/fir2.out" \
+ -vhdlout "$RDIR/fir2.vhdl"
+
+=cut

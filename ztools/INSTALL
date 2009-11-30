@@ -1,0 +1,41 @@
+INSTALLING ZTOOLS
+--------------------------------------------------------------------------------
+
+Install the following packages from CPAN:
+
+ Heap
+ Graph
+ Test::Unit
+ XML::Writer
+
+
+This can by easily achieved by using the CPAN.pm module
+
+perl -MCPAN -eshell
+
+If non root user, configure CPAN.pm to install packages into home directory. 
+Add ~/Perl/lib to your PERL5LIB environment variable
+
+export PERL5LIB=$PERL5LIB:~/Perl/lib 
+
+In the configuration phase for CPAN.pm chose a custom PREFIX and LIB path,
+when CPAN.pm asks about additional arguments to be passed to MakeMaker
+
+  PREFIX=~/Perl LIB=~/Perl/lib
+
+After that, CPAN.pm can be used to install the non-standard Perl modules, that
+are used by ztools
+
+  install Heap
+  install Graph
+  install Test::Unit
+  install XML::Writer
+
+RUNNING ZTOOLS
+--------------------------------------------------------------------------------
+
+To acheive reproducable runs set the following environment variable:
+  export PERL_HASH_SEED=0
+This prevents Perl from returning the keys in a hash in randomized order.
+
+

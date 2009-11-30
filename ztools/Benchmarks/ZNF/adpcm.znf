@@ -1,0 +1,75 @@
+znf 0.1 adpcm
+#
+# ADPCM decoding algorithm
+#
+
+i in  p_i.0:f
+
+o out p_o.0:f
+
+c obuf std *
+c op00 std *
+c op01 std *
+c op02 std *
+c op03 std *
+c op04a std *
+c op04b std *
+c op04c std *
+c op05 std *
+c op06 std *
+c op07 std *
+c op08 std *
+c op09 std *
+c op10 std *
+c op11 std *
+c op12 std *
+c op13 std *
+c op14 std *
+c op15 std *
+c op16 std *
+c op17 std *
+c op18 std *
+c op19 std *
+c op20 std *
+c op21 std *
+c op22 std *
+c op23 std *
+c op24 std *
+c op25a std *
+c op25b std *
+c op25c std *
+
+n nin in op00,op05,op06
+
+n n00 op00 op01
+n n01 op01 op02,op03,op04b
+n n02 op02 op04c
+n n03 op03 op04a,op04b
+n n04a op04a op04c
+n n04b op04b op04c
+n n04c op04c op01,op19
+n n05 op05 op22
+n n06 op06 op07,op08,op09
+n n07 op07 op14
+n n08 op08 op16
+n n09 op09 op18
+n n10 op10 op17
+n n11 op11 op15
+n n12 op12 op13,op14
+n n13 op13 op14
+n n14 op14 op15,op16
+n n15 op15 op16
+n n16 op16 op17,op18
+n n17 op17 op18
+n n18 op18 op20,op21
+n n19 op19 op10,op11,op12,op13
+n n20 op20 op22
+n n21 op21 op22
+n n22 op22 op24,op23,op25b
+n n23 op23 op25a,op25b
+n n24 op24 op25c
+n n25a op25a op25c
+n n25b op25b op25c
+n n25c op25c obuf,op20,op21
+
+n nout obuf out

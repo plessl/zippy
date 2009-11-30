@@ -1,0 +1,42 @@
+# 8tap FIR filtere on Zippy Array
+znf 0.1 fir8
+
+i in  p_i.0:f
+
+o out p_o.0:f
+
+c op0  std *
+c op1  std *
+c op2  std *
+c op3  std *
+c op4  std *
+c op5  std *
+c op6  std *
+c op7  std *
+c op8  std *
+c op9  std *
+c op10 std *
+c op11 std *
+c op12 std *
+c op13 std *
+c op14 std *
+c op15 std *
+
+n nin    in op0,op1,op2,op3,op4,op5,op6,op7
+n no0o8  op0 op8
+n no1o9  op1 op9
+n no2o10 op2 op10
+n no3o11 op3 op11
+n no4o12 op4 op12
+n no5o13 op5 op13
+n no6o14 op6 op14
+n no7o15 op7 op15
+n no15out op15 out
+
+n no8o9 op8 op9
+n no9o10 op9 op10
+n no10o11 op10 op11
+n no11o12 op11 op12
+n no12o13 op12 op13
+n no13o14 op13 op14
+n no14o15 op14 op15

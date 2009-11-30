@@ -1,0 +1,68 @@
+znf 0.1 iir
+# 2nd order IIR Filter
+#
+# r2 has been inserted into the netlist only for test purposes. It is not 
+#  required, but it serves as a test case, whether the passthroughcell insertion
+#  works correctly, when register nodes are connected directly to the output. 
+#
+#
+#
+#         | op1   |                            | op2   |   | op3   |   | r2   |
+# in ---> | add   |-------------------+------->| mul b0|-->| add   |-->| reg  |--> out
+#            A                        |                       A
+#            |                        |                       |
+#            |                        |                       |
+#            |                        v                       |
+#         | op4   |   | op5    |   | r0    |   | op6   |   | op7   |
+#         | add   |<--| mul -a1|<--| reg   |-->| mul b1|-->| add   |
+#            A                        |                       A
+#            |                        |                       |
+#            |                        |                       |
+#            |                        |                       |
+#            |        | op8    |   | r1    |   | op9   |      |
+#            +--------| mul -a2|<--| reg   |-->| mul b2|------+
+#
+#
+#  
+#
+#
+
+i in  p_i.0:f
+o out p_o.0:f
+
+# op2 const=b0
+# op5 const=-a1
+# op6 const=b1
+# op8 const=-a2
+# op9 const=b2
+
+## combinational operators
+c op1 op * f=add
+c op2 op * f=mul,i.1=const,const=1
+c op3 op * f=add
+c op4 op * f=add
+c op5 op * f=mul,i.1=const,const=2
+c op6 op * f=mul,i.1=const,const=3
+c op7 op * f=add
+c op8 op * f=mul,i.1=const,const=4
+c op9 op * f=mul,i.1=const,const=5
+
+## registers
+c r0   reg * f=pass0,i.0=noreg,o.0=reg
+c r1   reg * f=pass0,i.0=noreg,o.0=reg
+c r2   reg * f=pass0,i.0=noreg,o.0=reg
+
+n nin	in.o.0		op1.i.0
+n nop1	op1.o.0		op2.i.0,r0.i.0
+n nop2	op2.o.0		op3.i.1
+n nop3	op3.o.0		r2.i.0
+n nop4	op4.o.0		op1.i.1
+n nop5	op5.o.0		op4.i.0
+n nop6	op6.o.0		op7.i.1
+n nop7	op7.o.0		op3.i.0
+n nop8	op8.o.0		op4.i.1
+n nop9	op9.o.0		op7.i.0
+
+n nr0	r0.o.0		op5.i.0,op6.i.0,r1.i.0
+n nr1	r1.o.0		op8.i.0,op9.i.0
+n r2    r2.o.0      out.i.0

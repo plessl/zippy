@@ -1,0 +1,84 @@
+znf 0.1 adpcm
+#
+# ADPCM decoding algorithm
+#
+
+i in  p_i.0:f
+
+o out p_o.0:f
+
+c obuf  op * f=pass0
+c op00 	op * f=rom
+c op01 	op * f=add
+c op02 	op * f=gt,i.1=const,const=88
+c op03 	op * f=lt,i.1=const,const=0
+c op04a op * f=mux,i.0=const,i.1=const,const=88
+c op04b op * f=mux,i.1=const,const=0
+c op04c op * f=mux
+c op05 	op * f=tstbitat0,i.1=const,const=8
+c op06 	op * f=and,i.1=const,const=7
+c op07 	op * f=tstbitat1,i.1=const,const=4
+c op08 	op * f=tstbitat1,i.1=const,const=2
+c op09 	op * f=tstbitat1,i.1=const,const=1
+c op10 	op * f=srl,i.1=const,const=2
+c op11 	op * f=srl,i.1=const,const=1
+c op12 	op * f=srl,i.1=const,const=3
+c op13 	op * f=add
+c op14 	op * f=mux
+c op15 	op * f=add
+c op16 	op * f=mux
+c op17 	op * f=add
+c op18 	op * f=mux
+c op19 	op * f=rom
+c op20 	op * f=add
+c op21 	op * f=sub
+c op22 	op * f=mux
+c op23 	op * f=lt,i.1=const,const=32767
+c op24 	op * f=lt,i.1=const,const=-32768
+c op25a op * f=mux,i.0=const,i.1=const,const=-32767
+c op25b op * f=mux,i.1=const,const=32768
+c op25c op * f=mux
+
+## registers
+c r0    reg * f=pass0,i.0=noreg,o.0=reg
+c r1    reg * f=pass0,i.0=noreg,o.0=reg
+c r2    reg * f=pass0,i.0=noreg,o.0=reg
+
+n nin in op00.i.0,op05.i.0,op06.i.0
+
+n n00  op00.o.0  op01.i.0
+n n01  op01.o.0  op02.i.0,op03.i.0,op04b.i.0
+n n02  op02.o.0  op04c.i.0
+n n03  op03.o.0  op04a.i.2,op04b.i.2
+n n04a op04a.o.0 op04c.i.1
+n n04b op04b.o.0 op04c.i.0
+n n04c op04c.o.0 r0.i.0,op19.i.0
+n n05  op05.o.0  op22.i.2
+n n06  op06.o.0  op07.i.0,op08.i.0,op09.i.0
+n n07  op07.o.0  op14.i.2
+n n08  op08.o.0  op16.i.2
+n n09  op09.o.0  op18.i.2
+n n10  op10.o.0  op17.i.1
+n n11  op11.o.0  op15.i.1
+n n12  op12.o.0  op13.i.0,op14.i.0
+n n13  op13.o.0  op14.i.0
+n n14  op14.o.0  op15.i.0,op16.i.0
+n n15  op15.o.0  op16.i.1
+n n16  op16.o.0  op17.i.0,op18.i.0
+n n17  op17.o.0  op18.i.1
+n n18  op18.o.0  op20,op21
+n n19  op19.o.0  r1.i.0
+n n20  op20.o.0  op22.i.0
+n n21  op21.o.0  op22.i.1
+n n22  op22.o.0  op24.i.0,op23.i.0,op25b.i.0
+n n23  op23.o.0  op25a.i.2,op25b.i.2
+n n24  op24.o.0  op25c.i.2
+n n25a op25a.o.0 op25c.i.1
+n n25b op25b.o.0 op25c.i.0
+n n25c op25c.o.0 r2.i.0
+
+n nout obuf.o.0 out
+
+n nr0  r0.o.0    op01.i.1
+n nr1  r1.o.0    op10.i.0,op11.i.0,op12.i.0,op13.i.1
+n nr2  r2.o.0    obuf.i.0,op20.i.1,op21.i.0

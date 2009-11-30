@@ -1,0 +1,46 @@
+znf 0.1 in2out2demo
+# demo of netlist with multiple inputs and outputs
+#
+#   IN1          IN2
+#   |  \         /
+#   |   \       /
+#   |    \     /
+#   |     \   /
+#   v      v v   ------->
+#  |OP1|  |OP2|  <------- |OP3|
+#   | A     |
+#   | |     |
+#   V |     |
+#  |OP4|    |
+#    |      |
+#    v      v
+#   OUT1   OUT2
+
+
+i in1  p_i.0:f
+i in2  p_i.1:f
+
+o out1 p_o.0:f
+o out2 p_o.1:f
+
+c op1  std *
+c op2  std *
+c op3  std *
+c op4  std *
+
+# input nets
+n ni1o12  in1 op1,op2
+n ni2o2   in2 op2
+
+# nets at op2
+n no2o3  op2 op3
+n no3o2  op3 op2
+n no2o4  op2 op4
+
+# nets at op1
+n no1o4  op1 op4
+n no4o1  op4 op1
+
+# output nets
+n no4out1 op4 out1
+n no2out2 op2 out2

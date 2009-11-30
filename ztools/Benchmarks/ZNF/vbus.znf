@@ -1,0 +1,11 @@
+znf 0.1 vbus
+i in1  p_i.0:f
+
+o out1 p_o.0:f
+
+c op1  std c_0_0:f
+c op2  std c_7_1:f
+
+n nin in1 op1
+n n1 op1 op2
+n n2 op2 out1

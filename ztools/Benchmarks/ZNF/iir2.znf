@@ -1,0 +1,63 @@
+znf 0.1 iir
+# 2nd order IIR Filter
+#
+#           | OP1   |                              | OP2   |    | OP13  |
+# x(n) ---> | ADD   |-----------------> d(n) ----> | MUL b0|--->| ADD   | -----> y(n)
+#              A                          |                        A
+#              |                          |                        |
+#              |                          |                        |
+#              |                          v                        |
+#           | OP3   |    | OP4    |    | OP5  |    | OP6   |    | OP7   |
+#           | ADD   |<---| MUL -a1|<---| REG  |--->| MUL b1|--->| ADD   |
+#              A                          |                        A
+#              |                          |                        |
+#              |                          |                        |
+#              |                          v                        |
+#           | OP8   |    | OP9    |    | OP10 |    | OP11  |    | OP12  |
+#           | ADD   |<---| MUL -a2|<---| REG  |--->| MUL b2|--->| ADD   |
+#
+
+i in  p_i.0:f
+
+o out p_o.0:f
+
+c op1  std *
+c op2  std *
+c op3  std *
+c op4  std *
+c op5  std *
+c op6  std *
+c op7  std *
+c op8  std *
+c op9  std *
+c op10 std *
+c op11 std *
+c op12 std *
+c op13 std *
+
+# horizontal connections first row
+n nin      in    op1
+n no1o25   op1   op2,op5
+n no2o13   op2   op13
+n nout     op13  out
+
+# horizontal connections second row
+n no5o4    op5  op4
+n no4o3    op4  op3
+n no5o6    op5  op6
+n no6o7    op6  op7
+
+# horizontal connections third row
+n no10o9   op10 op9
+n no9o8    op9  op8
+n no10o11  op10 op11
+n no11o12  op11 op12
+
+# vertical connections of second and first row
+n no3o1    op3  op1
+n no7o3    op7  op13
+
+# vertical connections from third and second row
+n no8o3    op8  op3
+n no5o10   op5  op10
+n no12o7   op12 op7

@@ -1,0 +1,26 @@
+znf 0.1 fir2
+# 2nd order FIR Filter
+#
+#
+#  in -----+-------------+
+#          |             |
+#      | op1   |     | op2   |
+#      | MUL a2|     | MUL a1|
+#          |             |
+#          |             V
+#          |             2
+#          |         | op3   |
+#          +------->1| ADD   |-----> out        
+
+
+i in  p_i.0:f
+o out p_o.0:f
+
+c op1  std * f=alu_multlo,i.0=noreg,i.1=const,const=32,o.0=noreg
+c op2  std * f=alu_multlo,i.0=noreg,i.1=const,const=16,o.0=noreg
+c op3  std * f=alu_add,i.0=noreg,i.1=reg,o.0=noreg
+
+n nin      in        op1.i.0,op2.i.0
+n n1       op1.o.0   op3.i.1
+n n2       op2.o.0   op3.i.0
+n n3       op3.o.0   out

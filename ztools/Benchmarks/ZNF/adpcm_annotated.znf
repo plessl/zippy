@@ -1,0 +1,80 @@
+## ADPCM decode, preplace version
+##
+## annotated with more details description of ALU functions and 
+##  routing information (which net is to be routed to which ALU input)
+## ======================================================================
+## Architecture definition. (from file Benchmarks/Architectures/adpcm7x7_minimal.arch)
+## ======================================================================
+## ROWS=7 COLS=7
+## INPS=2 OPS=2
+## HBUS_H=2 HBUS_S=2 VBUS_E=2
+
+znf 0.1 adpcm
+i in p_i.0:f
+o out p_o.1:f
+
+c op0   std c_0_0:i f=alu_rom,i.0=noreg,rom=indextable,o.0=noreg
+c op1   std c_0_2:i f=alu_add,i.0=noreg,i.1=reg,o.0=noreg
+c op2   std c_0_1:i f=alu_gt,i.0=noreg,i.1=const,const=88,o.0=noreg
+c op3   std c_0_3:i f=alu_lt,i.0=noreg,i.1=const,const=0,o.0=noreg
+c op4a  std c_1_4:i f=alu_mux,i.0=const,i.1=const,i.2=noreg,const=88,o.0=noreg
+c op4b  std c_0_4:i f=alu_mux,i.0=noreg,i.1=const,i.2=noreg,const=0,o.0=noreg
+c op4c  std c_1_3:i f=alu_mux,i.0=noreg,i.1=noreg,i.2=noreg,o.0=noreg
+c op5   std c_5_6:i f=alu_tstbitat1,i.0=noreg,i.1=const,const=8,o.0=noreg
+c op6   std c_4_0:i f=alu_and,i.0=noreg,i.1=const,const=7,o.0=noreg
+c op7   std c_3_0:i f=alu_tstbitat1,i.0=noreg,i.1=const,const=4,o.0=noreg
+c op8   std c_4_1:i f=alu_tstbitat1,i.0=noreg,i.1=const,const=2,o.0=noreg
+c op9   std c_5_2:i f=alu_tstbitat1,i.0=noreg,i.1=const,const=1,o.0=noreg
+c op10  std c_2_3:i f=alu_srl,i.0=reg,i.1=const,const=2,o.0=noreg
+c op11  std c_2_2:i f=alu_srl,i.0=reg,i.1=const,const=1,o.0=noreg
+c op12  std c_1_1:i f=alu_srl,i.0=reg,i.1=const,const=3,o.0=noreg
+c op13  std c_2_1:i f=alu_add,i.0=noreg,i.1=reg,o.0=noreg
+c op14  std c_2_0:i f=alu_mux,i.0=noreg,i.1=noreg,i.2=noreg,o.0=noreg
+c op15  std c_3_1:i f=alu_add,i.0=noreg,i.1=noreg,o.0=noreg
+c op16  std c_4_2:i f=alu_mux,i.0=noreg,i.1=noreg,i.2=noreg,o.0=noreg
+c op17  std c_3_2:i f=alu_add,i.0=noreg,i.1=noreg,o.0=noreg
+c op18  std c_4_3:i f=alu_mux,i.0=noreg,i.1=noreg,i.2=noreg,o.0=noreg
+c op19  std c_1_2:i f=alu_rom,rom=stepsizetable,i.0=noreg,o.0=noreg
+c op20  std c_4_5:i f=alu_add,i.0=noreg,i.1=reg,o.0=noreg
+c op21  std c_5_4:i f=alu_sub,i.0=reg,i.1=noreg,o.0=noreg
+c op22  std c_4_6:i f=alu_mux,i.0=noreg,i.1=noreg,i.2=noreg,o.0=noreg
+c op23  std c_3_6:i f=alu_gt,i.0=noreg,i.1=const,const=32767,o.0=noreg
+c op24  std c_5_5:i f=alu_lt,i.0=noreg,i.1=const,const=-32768,o.0=noreg
+c op25a std c_3_4:i f=alu_mux,i.0=const,i.1=const,i.2=noreg,const=-32767,o.0=noreg
+c op25b std c_3_5:i f=alu_mux,i.0=noreg,i.1=const,i.2=noreg,const=32768,o.0=noreg
+c op25c std c_4_4:i f=alu_mux,i.0=noreg,i.1=noreg,i.2=noreg,o.0=noreg
+c obuf  std c_5_3:i f=alu_pass0,i.0=reg,o.0=noreg
+
+n nin  in        op0.i.0,op5.i.0,op6.i.0
+n n0   op0.o.0   op1.i.0
+n n1   op1.o.0   op2.i.0,op3.i.0,op4b.i.0
+n n2   op2.o.0   op4c.i.2
+n n3   op3.o.0   op4a.i.2,op4b.i.2
+n n4a  op4a.o.0  op4c.i.1
+n n4b  op4b.o.0  op4c.i.0
+n n4c  op4c.o.0  op1.i.1,op19.i.0
+n n5   op5.o.0   op22.i.2
+n n6   op6.o.0   op7.i.0,op8.i.0,op9.i.0
+n n7   op7.o.0   op14.i.2
+n n8   op8.o.0   op16.i.2
+n n9   op9.o.0   op18.i.2
+n n10  op10.o.0  op17.i.1
+n n11  op11.o.0  op15.i.1
+n n12  op12.o.0  op13.i.0,op14.i.0
+n n13  op13.o.0  op14.i.1
+n n14  op14.o.0  op15.i.0,op16.i.0
+n n15  op15.o.0  op16.i.1
+n n16  op16.o.0  op17.i.0,op18.i.0
+n n17  op17.o.0  op18.i.1
+n n18  op18.o.0  op20.i.0,op21.i.1
+n n19  op19.o.0  op10.i.0,op11.i.0,op12.i.0,op13.i.1
+n n20  op20.o.0  op22.i.0
+n n21  op21.o.0  op22.i.1
+n n22  op22.o.0  op24.i.0,op23.i.0,op25b.i.0
+n n23  op23.o.0  op25a.i.2,op25b.i.2
+n n24  op24.o.0  op25c.i.2
+n n25a op25a.o.0 op25c.i.1
+n n25b op25b.o.0 op25c.i.0
+n n25c op25c.o.0 obuf.i.0,op20.i.1,op21.i.0
+n nout obuf.o.0  out
+
